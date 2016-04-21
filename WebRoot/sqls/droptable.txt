@@ -1,0 +1,3 @@
+SET foreign_key_checks = 0;
+DROP table user;
+SET foreign_key_checks = 1;

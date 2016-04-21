@@ -1,0 +1,32 @@
+Making user table and 
+
+Userdetaildelimiter $$
+
+CREATE TABLE `Userdetail` (
+  `userdetailprivateIdentity` varchar(255) NOT NULL,
+  `userdetaildisplayName` varchar(255) DEFAULT NULL,
+  `userdetailpassword` varchar(255) DEFAULT NULL,
+  `userdetailpublicIdentity` varchar(255) DEFAULT NULL,
+  `userdetailrealm` varchar(255) DEFAULT NULL,
+  `userdetailsecretAnswer` varchar(255) DEFAULT NULL,
+  `userdetailsecretQuestion` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`userdetailprivateIdentity`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1$$
+
+
+
+--------------------------------------------------------------------
+
+Make user_role table
+
+CREATE TABLE `users` (
+  `USER_ID` int(10) unsigned NOT NULL,
+  `USERNAME` varchar(40) NOT NULL,
+  `PASSWORD` varchar(40) NOT NULL,
+  `ACTIVE` tinyint(1) NOT NULL,
+  PRIMARY KEY (`USER_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1$$
+
+
+
+

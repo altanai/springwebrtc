@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:beans="http://www.springframework.org/schema/beans"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xmlns:p="http://www.springframework.org/schema/p" 
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/security
+                           http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+
+   <security:http auto-config="true" >
+		
+		<!-- <security:intercept-url pattern="/index*" access="ROLE_USER" /> -->
+	 <!--  <security:intercept-url pattern="/login*" access="permitAll"/> -->
+	  <security:intercept-url pattern="/index*" access="ROLE_ADMIN"/>
+	  <security:intercept-url pattern="/dashboard*" access="ROLE_USER"/>
+				
+		<security:form-login login-page="/login" 
+			default-target-url="/loaddashboard?userdetailprivateIdentity=?"
+			authentication-failure-url="/fail2login" 
+			authentication-success-handler-ref="SuccessHandler"/>
+				
+		<security:logout logout-success-url="/dologout" />
+  
+	</security:http>
+
+    <beans:bean id="SuccessHandler" class="com.webrtc.security.Loginsucesshandler" />
+        
+    <security:authentication-manager>
+	  <security:authentication-provider>
+	    <!-- <security:user-service>
+			<security:user name="dineshonjava" password="sweety" authorities="ROLE_USER" />
+	    </security:user-service> -->
+ 	    <security:jdbc-user-service data-source-ref="dataSource"  
+	    	users-by-username-query="select username, password, active from Users where username=?" 
+     	   	authorities-by-username-query="select us.username, ur.authority from Users us, User_roles ur 
+		      where us.user_id = ur.user_id and us.username =?  " 
+		/> 
+		
+<!-- 		  <security:jdbc-user-service data-source-ref="dataSource"  
+	    	users-by-username-query="select userdetailprivateIdentity,userdetailpassword 
+									from from Userdetail 
+									where userdetailprivateIdentity=?" 
+			authorities-by-username-query=""
+		/>  -->
+		
+	  </security:authentication-provider>
+	</security:authentication-manager>
+
+</beans>
+

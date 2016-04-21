@@ -1,0 +1,33 @@
+
+DELIMITER $$
+CREATE TRIGGER afterregister
+AFTER INSERT ON `webrtcdatabase`.`Userdetail`
+FOR EACH ROW
+BEGIN
+ 
+    INSERT INTO `webrtcdatabase`.`Users`  
+       set  username = NEW.userdetailprivateIdentity,
+        password = NEW.userdetailpassword,
+        active = 1; 
+        
+END $$
+DELIMITER ;
+
+
+
+
+DELIMITER $$
+CREATE TRIGGER afterusers
+    AFTER INSERT ON `webrtcdatabase`.`Users`
+    FOR EACH ROW
+
+ BEGIN
+ 
+    INSERT INTO `webrtcdatabase`.`User_roles` 
+       set  user_id= NEW.user_id,
+        authority = 'ROLE_USER'; 
+        
+END $$
+DELIMITER ;
+
+

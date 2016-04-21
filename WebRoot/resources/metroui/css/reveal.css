@@ -1,0 +1,484 @@
+/*	--------------------------------------------------
+	Reveal Modals
+	-------------------------------------------------- */
+.reveal-modal-bg {
+	position: fixed;
+	height: 100%;
+	width: 100%;
+	background: #000;
+	background: rgba(0, 0, 0, .8);
+	z-index: 10000;
+	display: none;
+	top: 0;
+	left: 0;
+}
+
+h2 {
+	text-align: center;
+}
+
+.table-col {
+	
+}
+
+.button {
+	border-top: 1px solid #96d1f8;
+	background: #65a9d7;
+	background: -webkit-gradient(linear, left top, left bottom, from(#c5cfd6),
+		to(#65a9d7) );
+	background: -webkit-linear-gradient(top, #c5cfd6, #65a9d7);
+	background: -moz-linear-gradient(top, #c5cfd6, #65a9d7);
+	background: -ms-linear-gradient(top, #c5cfd6, #65a9d7);
+	background: -o-linear-gradient(top, #c5cfd6, #65a9d7);
+	padding: 4px 8px;
+	-webkit-border-radius: 8px;
+	-moz-border-radius: 8px;
+	border-radius: 8px;
+	-webkit-box-shadow: rgba(0, 0, 0, 1) 0 1px 0;
+	-moz-box-shadow: rgba(0, 0, 0, 1) 0 1px 0;
+	box-shadow: rgba(0, 0, 0, 1) 0 1px 0;
+	text-shadow: rgba(0, 0, 0, .4) 0 1px 0;
+	color: #0a010a;
+	font-size: 11px;
+	font-family: 'Lucida Grande', Helvetica, Arial, Sans-Serif;
+	text-decoration: none;
+	vertical-align: middle;
+	margin-bottom: 5px;
+}
+
+.button:hover {
+	border-top-color: #2a5069;
+	background: #2a5069;
+	color: #ccc;
+}
+
+.button:active {
+	border-top-color: #1b435e;
+	background: #1b435e;
+}
+
+.reveal-modal {
+	visibility: hidden;
+	top: 15%;
+	margin-left: 25%;
+	width: 49%;
+	height: 65%;
+	background: #eee url('../img/modal-gloss.png') no-repeat -200px -80px;
+	position: absolute;
+	z-index: 101000;
+	padding: 30px 40px 34px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	-moz-box-shadow: 0 0 10px rgba(0, 0, 0, .4);
+	-webkit-box-shadow: 0 0 10px rgba(0, 0, 0, .4);
+	-box-shadow: 0 0 10px rgba(0, 0, 0, .4);
+}
+
+.reveal-modal-callLogs {
+	visibility: hidden;
+	top: 15%;
+	margin-left: 15%;
+	width: 60%;
+	height: 60%;
+	background: #eee url('../img/modal-gloss.png') no-repeat -200px -80px;
+	position: absolute;
+	z-index: 101000;
+	padding: 30px 40px 34px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	-moz-box-shadow: 0 0 10px rgba(0, 0, 0, .4);
+	-webkit-box-shadow: 0 0 10px rgba(0, 0, 0, .4);
+	-box-shadow: 0 0 10px rgba(0, 0, 0, .4);
+}
+
+.reveal-modal-contacts {
+	visibility: hidden;
+	top: 15%;
+	margin-left: 25%;
+	width: 49%;
+	height: 60%;
+	background: #eee url('../img/modal-gloss.png') no-repeat -200px -80px;
+	position: absolute;
+	z-index: 101000;
+	padding: 30px 40px 34px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	-moz-box-shadow: 0 0 10px rgba(0, 0, 0, .4);
+	-webkit-box-shadow: 0 0 10px rgba(0, 0, 0, .4);
+	-box-shadow: 0 0 10px rgba(0, 0, 0, .4);
+}
+
+.reveal-modal-offline {
+	visibility: hidden;
+	top: 15%;
+	margin-left: 25%;
+	width: 45%;
+	height: 60%;
+	background: #eee url('../img/modal-gloss.png') no-repeat -200px -80px;
+	position: absolute;
+	z-index: 101000;
+	padding: 30px 40px 34px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	-moz-box-shadow: 0 0 10px rgba(0, 0, 0, .4);
+	-webkit-box-shadow: 0 0 10px rgba(0, 0, 0, .4);
+	-box-shadow: 0 0 10px rgba(0, 0, 0, .4);
+}
+
+.reveal-modal-offline a {
+	font-size: 15px;
+}
+
+.reveal-modal.small {
+	width: 200px;
+	margin-left: -140px;
+}
+
+.reveal-modal.medium {
+	width: 400px;
+	margin-left: -240px;
+}
+
+.reveal-modal.large {
+	width: 600px;
+}
+
+.reveal-modal.xlarge {
+	width: 70%;
+	height: 110%;
+	top: 10%;
+	margin-left: 13%;
+}
+
+.reveal-modal.xxlarge {
+	top: 10%;
+	margin-left: 13%;
+	width: 900px;
+	height: 80%;
+
+}
+
+.reveal-modal .close-reveal-modal {
+	font-size: 22px;
+	line-height: .5;
+	position: absolute;
+	top: 8px;
+	right: 11px;
+	color: #aaa;
+	text-shadow: 0 -1px 1px rbga(0, 0, 0, .6);
+	font-weight: bold;
+	cursor: pointer;
+}
+
+.reveal-modal-contacts .close-reveal-modal {
+	font-size: 22px;
+	line-height: .5;
+	position: absolute;
+	top: 8px;
+	right: 11px;
+	color: #aaa;
+	text-shadow: 0 -1px 1px rbga(0, 0, 0, .6);
+	font-weight: bold;
+	cursor: pointer;
+}
+
+.reveal-modal-offline .close-reveal-modal {
+	font-size: 22px;
+	line-height: .5;
+	position: absolute;
+	top: 8px;
+	right: 11px;
+	color: #aaa;
+	text-shadow: 0 -1px 1px rbga(0, 0, 0, .6);
+	font-weight: bold;
+	cursor: pointer;
+}
+
+.reveal-modal-callLogs .close-reveal-modal {
+	font-size: 22px;
+	line-height: .5;
+	position: absolute;
+	top: 8px;
+	right: 11px;
+	color: #aaa;
+	text-shadow: 0 -1px 1px rbga(0, 0, 0, .6);
+	font-weight: bold;
+	cursor: pointer;
+}
+
+.btn {
+	-moz-box-shadow: inset 0px 1px 0px 0px #15EC62;
+	-webkit-box-shadow: inset 0px 1px 0px 0px #15EC62;
+	box-shadow: inset 0px 1px 0px 0px #22DD4F;
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0.05, #IE9900
+		), color-stop(1, #00640C) );
+	background: -moz-linear-gradient(center top, #IE9900 5%, #00640C 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#63b8ee',
+		endColorstr='#468ccf' );
+	background-color: #1ECC48;
+	-webkit-border-top-left-radius: 0px;
+	-moz-border-radius-topleft: 0px;
+	border-top-left-radius: 0px;
+	-webkit-border-top-right-radius: 0px;
+	-moz-border-radius-topright: 0px;
+	border-top-right-radius: 0px;
+	-webkit-border-bottom-right-radius: 0px;
+	-moz-border-radius-bottomright: 0px;
+	border-bottom-right-radius: 0px;
+	-webkit-border-bottom-left-radius: 0px;
+	-moz-border-radius-bottomleft: 0px;
+	border-bottom-left-radius: 0px;
+	text-indent: 0;
+	border: 1px solid #1BE433;
+	display: inline-block;
+	color: #ffffff;
+	font-family: Arial;
+	font-size: 15px;
+	font-weight: normal;
+	font-style: normal;
+	height: 30px;
+	line-height: 30px;
+	width: 100px;
+	text-decoration: none;
+	text-align: center;
+	margin-top: 7px;
+	margin-left: 15px;
+}
+
+.btn:hover {
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0.05, #468ccf
+		), color-stop(1, #63b8ee) );
+	background: -moz-linear-gradient(center top, #468ccf 5%, #63b8ee 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#468ccf',
+		endColorstr='#63b8ee' );
+	background-color: #468ccf;
+}
+
+.btn:active {
+	position: relative;
+	top: 1px;
+}
+
+.box {
+	background-color: #D8D8D8;
+	border-radius: 7px;
+	width: 60%;
+	height: 70%;
+	margin-top: 3%;
+	margin-left: 20%;
+}
+
+@media all and (max-width:768px) and (min-width:320px) and
+	(orientation:portrait) {
+	.reveal-modal.xxlarge {
+		margin-left: 10%;
+		width: 600px;
+		height: 160%;
+	}
+	.reveal-modal.xlarge {
+		width: 170%;
+		height: 125%;
+	}
+	.selectinerest {
+		width: 72.27%;
+	}
+	.reveal-modal {
+		visibility: hidden;
+		top: 10%;
+		margin-left: 25%;
+		width: 350px;
+		height: 70%;
+		background: #eee url('../img/modal-gloss.png') no-repeat -200px -80px;
+		position: absolute;
+		z-index: 101000;
+		padding: 30px 40px 34px;
+		-moz-border-radius: 5px;
+		-webkit-border-radius: 5px;
+		border-radius: 5px;
+		-moz-box-shadow: 0 0 10px rgba(0, 0, 0, .4);
+		-webkit-box-shadow: 0 0 10px rgba(0, 0, 0, .4);
+		-box-shadow: 0 0 10px rgba(0, 0, 0, .4);
+	}
+	.reveal-modal-contacts {
+		visibility: hidden;
+		margin-left: 75px;
+		width:600px;
+		height: 80%;
+		background: #eee url('../img/modal-gloss.png') no-repeat -200px -80px;
+		position: absolute;
+		z-index: 101000;
+		padding: 30px 40px 34px;
+		-moz-border-radius: 5px;
+		-webkit-border-radius: 5px;
+		border-radius: 5px;
+		-moz-box-shadow: 0 0 10px rgba(0, 0, 0, .4);
+		-webkit-box-shadow: 0 0 10px rgba(0, 0, 0, .4);
+		-box-shadow: 0 0 10px rgba(0, 0, 0, .4);
+	}
+	.reveal-modal-offline {
+		height: 70%;
+		width: 400px;
+	}
+	.reveal-modal-offline img {
+		height: 30px;
+		width: 30px;
+	}
+	.reveal-modal-offline a {
+		font-size: 12px;
+	}
+	.reveal-modal-callLogs {
+		margin-left: 10%;
+		width: 550px;
+		height: 95%;
+	}
+}
+
+@media all and (max-width:768px) and (min-width:320px) and
+	(orientation:landscape) {
+	.reveal-modal.xxlarge {
+		margin-left: 10%;
+		width: 120%;
+		height: 180%;
+	}
+	.reveal-modal.xlarge {
+		height: 230%;
+		width: 140%;
+	}
+	.selectinerest {
+		width: 72.27%;
+	}
+	.reveal-modal {
+		visibility: hidden;
+		top: 15%;
+		margin-left: 25%;
+		width: 49%;
+		height: 110%;
+		background: #eee url('../img/modal-gloss.png') no-repeat -200px -80px;
+		position: absolute;
+		z-index: 101000;
+		padding: 30px 40px 34px;
+		-moz-border-radius: 5px;
+		-webkit-border-radius: 5px;
+		border-radius: 5px;
+		-moz-box-shadow: 0 0 10px rgba(0, 0, 0, .4);
+		-webkit-box-shadow: 0 0 10px rgba(0, 0, 0, .4);
+		-box-shadow: 0 0 10px rgba(0, 0, 0, .4);
+	}
+	.reveal-modal-contacts {
+		visibility: hidden;
+		top: 10%;
+		margin-left: 25%;
+		width: 100%;
+		height: 140%;
+		background: #eee url('../img/modal-gloss.png') no-repeat -200px -80px;
+		position: absolute;
+		z-index: 101000;
+		padding: 30px 40px 34px;
+		-moz-border-radius: 5px;
+		-webkit-border-radius: 5px;
+		border-radius: 5px;
+		-moz-box-shadow: 0 0 10px rgba(0, 0, 0, .4);
+		-webkit-box-shadow: 0 0 10px rgba(0, 0, 0, .4);
+		-box-shadow: 0 0 10px rgba(0, 0, 0, .4);
+	}
+	.reveal-modal-offline {
+		height: 120%;
+		width: 50%;
+	}
+	.reveal-modal-offline img {
+		height: 30px;
+		width: 30px;
+	}
+	.reveal-modal-offline a {
+		font-size: 12px;
+	}
+	.reveal-modal-callLogs {
+		margin-left: 10%;
+		width: 100%;
+		height: 140%;
+	}
+}
+
+@media all and (max-width:801px) and (min-width:769px) {
+	.reveal-modal.xxlarge {
+		width: 70%;
+		height: 110%;
+	}
+	.reveal-modal.xlarge {
+		height: 185%;
+		width: 110%;
+	}
+	.selectinerest {
+		width: 72.27%;
+	}
+	.reveal-modal {
+		height: 75%;
+	}
+	.reveal-modal input {
+		width: 125px;
+		height: 20px;
+	}
+	.reveal-modal-contacts {
+		width: 63%;
+		height: 85%;
+		margin-left: 120px;
+		margin-top: -20px;
+	}
+	.reveal-modal-offline {
+		height: 75%;
+		width: 45%;
+		font-size: 15px;
+	}
+	.reveal-modal-offline h2 {
+		font-size: 1.5em;
+	}
+	.reveal-modal-offline img {
+		height: 30px;
+		width: 30px;
+	}
+	.reveal-modal-offline a {
+		font-size: 12px;
+	}
+	.reveal-modal-callLogs {
+		width: 70%;
+		height: 85%;
+	}
+}
+
+@media all and (max-width:1026px) and (min-width:803px) {
+	.reveal-modal.xlarge {
+		margin-left:50px;
+		width: 85%;
+	}
+	.reveal-modal-callLogs {
+		height: 65%;
+	}
+	.reveal-modal.xxlarge {
+	
+	width: 700px;
+	height: 600px;
+	}
+}
+
+@media all and (max-height:1024px) and (min-height:769px) {
+
+.reveal-modal-callLogs {
+	height:440px;
+}
+.reveal-modal.xxlarge {
+	height:700px;
+}
+.reveal-modal{
+	height:400px;
+}
+.reveal-modal-contacts{
+	height:450px;
+}
+.reveal-modal-offline{
+	height:370px;
+}
+}

@@ -1,0 +1,29 @@
+INSERT INTO `DAVDB`.`user_roles`
+(
+`USER_ID`,
+`AUTHORITY`)
+VALUES
+(
+1,
+'ROLE_USER'
+);
+
+INSERT INTO `DAVDB`.`user_roles`
+(
+`USER_ID`,
+`AUTHORITY`)
+VALUES
+(
+2,
+'ROLE_USER'
+);
+
+INSERT INTO `webrtcdatabase`.`User_roles`
+(
+`USER_ID`,
+`AUTHORITY`)
+VALUES
+(
+3,
+'ROLE_ADMIN'
+);

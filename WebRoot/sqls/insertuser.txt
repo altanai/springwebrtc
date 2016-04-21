@@ -1,0 +1,35 @@
+INSERT INTO `DAVDB`.`users`
+(
+`USERNAME`,
+`PASSWORD`,
+`ACTIVE`)
+VALUES
+(
+'sip:bob@tcs.com',
+'bob',
+1
+);
+
+INSERT INTO `DAVDB`.`users`
+(
+`USERNAME`,
+`PASSWORD`,
+`ACTIVE`)
+VALUES
+(
+'sip:alice@tcs.com',
+'alice',
+1
+);
+
+INSERT INTO `webrtcdatabase`.`Users`
+(
+`USERNAME`,
+`PASSWORD`,
+`ACTIVE`)
+VALUES
+(
+'sip:admintcs@tcs.com',
+'tcs@1234',
+1
+);
