@@ -5,10 +5,6 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-/**
- * @author altanai
- *
- */
 @Entity
 @Table(name="Notification")
 public class Notification {
@@ -21,8 +17,8 @@ public class Notification {
 	private String notificationSender;
 	
 	@Column(name="RECEIVER")
-	private String receiver;
-
+	private String notificationReceiver;
+	
 	@Column(name="TIMEOFNOTIFICATION")
 	private String notificationTON;
 	
@@ -45,14 +41,14 @@ public class Notification {
 		this.notificationSender = notificationSender;
 	}
 
-	public String getReceiver() {
-		return receiver;
+	public String getNotificationReceiver() {
+		return notificationReceiver;
 	}
 
-	public void setReceiver(String receiver) {
-		this.receiver = receiver;
+	public void setNotificationReceiver(String notificationReceiver) {
+		this.notificationReceiver = notificationReceiver;
 	}
-	
+
 	public String getNotificationTON() {
 		return notificationTON;
 	}

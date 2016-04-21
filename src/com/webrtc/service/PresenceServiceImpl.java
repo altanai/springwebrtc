@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.webrtc.dao.PresenceDao;
-import com.webrtc.model.Contact;
 import com.webrtc.model.Presence;
 
 @Service("presenceService")
@@ -42,7 +41,5 @@ public class PresenceServiceImpl implements PresenceService {
 		// TODO Auto-generated method stub
 		presenceDao.deletePresence(presence);
 	}
-
-	
 
 }

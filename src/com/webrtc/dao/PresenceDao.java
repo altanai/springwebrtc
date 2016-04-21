@@ -12,10 +12,4 @@ public interface PresenceDao {
 	public Presence getPresence(String sipuri);
 	
 	public void deletePresence(Presence presence);
-
-	/**
-	 * @param sipuri
-	 * @return
-	 */
-	
 }

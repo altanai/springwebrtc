@@ -6,7 +6,6 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import com.webrtc.model.Contact;
 import com.webrtc.model.Presence;
 
 @Repository("presenceDao")
@@ -42,6 +41,4 @@ public class PresenceDaoImpl implements PresenceDao{
 		sessionFactory.getCurrentSession().createQuery("DELETE FROM Presence WHERE presencesipuri = "+presence.getPresencesipuri()).executeUpdate();
 
 	}
-
-
 }

@@ -12,25 +12,13 @@
 		
 		<link href='http://fonts.googleapis.com/css?family=Droid+Sans:400,700' rel='stylesheet'>
 	<link href="<c:url value="resources/metroui/css/login.css"/>" rel="stylesheet"  />
-
-<style>
+	<style>
   .error {
 color: #ff0000;
 font-style: italic;
      }
 </style>
-
-<style>
-.errorblock {
-	color: #ff0000;
-	background-color: #ffEEEE;
-	border: 3px solid #ff0000;
-	padding: 8px;
-	margin: 16px;
-}
-</style>
-
-</head>
+	</head>
 	<%
 	UserdetailBean login= new UserdetailBean(); 
 	%>
@@ -39,7 +27,7 @@ font-style: italic;
 	}
 	%>
 	
-	<body onload='document.f.j_username.focus();'>
+	<body>
 	<div style="padding-bottom: 100px"></div>
 	<!-- BEGIN HEADER -->
 			<!-- <header class="clearfix">
@@ -60,11 +48,11 @@ font-style: italic;
 		<br/>
 		<br/>
 		<h1 align="center">Login </h1>
-<%-- 		<form:form method="GET" action="/sdnext/dologinvalidate.html">
-		<div class="header">
+		<form:form method="GET" action="/sdnext/dologinvalidate.html">
+		<%-- <div class="header">
 			<!-- <a href="Registration.jsp">Register</a> -->
 		<p><img src="<c:url value="resources/metroui/images/TCSLogo.jpg"/>">&nbsp;&nbsp;Unified Communicator</p>
-	</div>
+	</div> --%>
 	   		<table align="center">
 			    <tr>
 			        <td style="font-size:15px;"><form:label path="privateIdentity">Sipuri :</form:label></td>
@@ -82,41 +70,7 @@ font-style: italic;
 		      </tr>
 		      
 			</table> 
-		</form:form> --%>
-		
-		<c:if test="${not empty error}">
-		<div class="errorblock">
-			Your login attempt was not successful, try again.<br /> Caused :
-			${sessionScope["SPRING_SECURITY_LAST_EXCEPTION"].message}
-		</div>
-	</c:if>
- 
-	<form name='f' action="<c:url value='j_spring_security_check' />"
-		method='POST'>
- 
-		<table align="center">
-			<tr>
-				<td>User:</td>
-				<td><input type='text' name='j_username' value=''>
-				</td>
-			</tr>
-			<tr>
-				<td>Password:</td>
-				<td><input type='password' name='j_password' />
-				</td>
-			</tr>
-			<tr>
-				<td colspan='2'><input name="submit" type="submit"
-					value="submit" />
-				</td>
-			</tr>
-			<tr>
-				<td colspan='2'><input name="reset" type="reset" />
-				</td>
-			</tr>
-		</table>
- 
-	</form>
+		</form:form>
 <div id="errordiv" style="color: red; font-size: 13px; margin-left: 35%;">${errorDetails.errorMsg}</div>
 </body>
 

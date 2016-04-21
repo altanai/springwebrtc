@@ -33,6 +33,8 @@
 		
 		
 		<c:if test="${!empty contacts}">
+		
+		
 		<h2>List Contacts</h2>
 	<table align="left" border="1">
 		<tr>
@@ -54,7 +56,7 @@
 			
 		</c:forEach>
 	</table>
-	</c:if>
+</c:if>
 
 </body>
 </html>

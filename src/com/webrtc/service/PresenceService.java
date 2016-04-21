@@ -13,6 +13,5 @@ public interface PresenceService {
 	public Presence getPresence(String sipuri);
 	
 	public void deletePresence(Presence presence);
-
 	
 }

@@ -16,5 +16,4 @@ public interface UserdetailService {
 	
 	public List<Userdetail> loginUserdetail(String sipuri, String password);
 	
-	public List<Userdetail> listUserdetailNotFriend(Userdetail userdetail);
 }

@@ -5,8 +5,6 @@ package com.webrtc.bean;
 
 import javax.persistence.Column;
 
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
-
 /**
  * @author altanai
  *
@@ -20,23 +18,7 @@ public class UserdetailBean {
 	private String realm;
 	private String secretQuestion;
 	private String secretAnswer;
-	private String fileName;
 
-	private CommonsMultipartFile fileData;
-
-	public CommonsMultipartFile getFileData() {
-		return fileData;
-	}
-	public void setFileData(CommonsMultipartFile fileData) {
-		this.fileData = fileData;
-	}
-	public String getFileName() {
-		return fileName;
-	}
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
-	
 	/**
 	 * @return the privateIdentity
 	 */
@@ -121,6 +103,5 @@ public class UserdetailBean {
 	public void setSecretAnswer(String secretAnswer) {
 		this.secretAnswer = secretAnswer;
 	}
-	
 
 }

@@ -573,7 +573,7 @@
     
   //presence
 	function sipPublis(s_type) {
-		//alert("publish called ");
+		alert("publish called ");
 		oSipPublish = oSipStack.newSession('publish', {
 			expires : 100,
 			sip_headers : [ {
@@ -616,7 +616,7 @@
 		},90000);
 	//subscribe
 	function sipSubscribe() {
-		//alert(" subscribe called ");
+		alert(" subscribe called ");
 		for(var i=0;i<friendslist.length;i++)
 			 {
 			 	
@@ -1595,7 +1595,7 @@ function create( template, vars, opts ){
 
 	
 
-/* var refreshId2 = setInterval(function(){
+var refreshId2 = setInterval(function(){
 	$containerN = $("#containerNote").notify();	
 
 		$.ajax({
@@ -1606,13 +1606,11 @@ function create( template, vars, opts ){
 		 	{
 		 		$("#containerNote").html('');
 		    		$.each(data.Notifications, function(key, val) {
-
-			 			 if(val.TYPE.match("VOICEMAIL")){
+		 			/*  if(val.TYPE.match("VOICEMAIL")){
 		 				 create("withIcon", { title:'New VoiceMail Received!', text:val.DETAILS+' <a style="color:white;text-decoration:underline; cursor: pointer;"  id="'+val.ID+'" class="ui-notify-close" onclick="updateStatusVoiceMail(this);">Listen</a>', icon:'info.png' },{ 
 				 			 expires:false
-		 					});
-		 				 } 
-	 				 
+		 				});
+		 				 } */
 		 				  if(val.TYPE.match("CONFERENCE")){
 		 					 create("withIcon", { title:'Conference Invite!', text:val.DETAILS+'  <a style="color:white;text-decoration:underline; cursor: pointer;"  id="'+val.ID+'" class="ui-notify-close" onclick="updateStatusConference(this);">Join</a> <a style="color:white;text-decoration:underline; cursor: pointer;"  id="'+val.ID+'" class="ui-notify-close" onclick="declineConference(this);">Decline</a>', icon:'info.png' },{ 
 					 			 expires:false
@@ -1622,7 +1620,7 @@ function create( template, vars, opts ){
 		 	}
 		});  
     }, 10000);
- */
+
 
 </script>
 
@@ -1652,8 +1650,7 @@ function videoConf(){
 	<div class="header">	
 		<p>	<img src="<c:url value="resources/metroui/images/TCSLogo.jpg"/>"/>
 			Unified Communicator
-			<!-- <a class="header-anchor" href="dologout.html" onclick="stopStack();"><font color="#ffffff">Logout</font></a> -->		
-		   <a class="header-anchor" href='<c:url value="/j_spring_security_logout" />' onclick="stopStack();"><font color="#ffffff">Logout</font></a>
+			<a class="header-anchor" href="dologout.html" onclick="stopStack();"><font color="#ffffff">Logout</font></a>		
 		</p>		
 	</div>
 	<div class="navbar" align="center" style="display:none;">
@@ -1899,22 +1896,21 @@ function videoConf(){
 							}  
 
 						function updateProfilePic(){
-
-							alert(" func: update profile picture ");	
+							
 						var file=document.getElementById("profilePic").files[0];
 						var formData=new FormData();
-						
+						alert(file.name);
 						formData.append("picFile",file);
 							var xmlHttp=new  XMLHttpRequest();
-							
+							alert("xml Request");
 							xmlHttp.open("POST","updateProfilePic.html",false);
 							xmlHttp.onreadystatechange=function(){
 								if(xmlHttp.readyState==4&&xmlHttp.status==200){
-									alert("Profile-Picure is updated");
+									alert("Profile-Pic updated");
 									}
 								}
 							xmlHttp.send(formData);
-							
+							alert("XmlRequestSent");
 							}
 						</script>
 						
@@ -1940,7 +1936,7 @@ function videoConf(){
 							    </tr>
 							    <tr>
 							      <td><input type="button" value="Add Users" onclick="doAjaxPostOpenid()"></td>
-							      <!-- <td colspan="2"><input type="submit" value="Submit"/></td> -->
+							      <td colspan="2"><input type="submit" value="Submit"/></td>
 						      </tr>
 							</table> 
 						</form:form>
@@ -1952,181 +1948,83 @@ function videoConf(){
 	<div id="friendList" class="reveal-modal-contacts" >
 	<h2>Your Contacts</h2>	
 	<a class="close-reveal-modal">&#215;</a>
-	<div style="width: 45%; float: left;margin-top:20px;">
-			<div style="height:45%;max-height:10%;">		
-				<div style="height: 4%;">&nbsp;&nbsp;&nbsp;<span style="color: red;" id="user-error"></span></div>
-				<h6 style="margin-left:20%;height:6%;margin-bottom:10px;">People in your phone book</h6>
-				<div style="padding-top:2%;max-height:130px;overflow:auto;" id="frndDiv">	
 	
 <script type="text/javascript">
+						function doAjaxPostContacts() {  
+							  // get the form values  
+						
+							  var sipuri = $('#sipuri').val();	 
+							  var friend = $('#friend').val();
+							   alert (" contact data "+ sipuri+""+ friend)
+							  $.ajax({  
+							    type: "POST",  
+							    url: "/sdnext/addcontactajax.html",  
+							    data: "sipuri=" + sipuri + "&friend=" + friend,  
+							    success: function(response){  							     
+							      $('#infocontact').html(response);
+							   		/* $('#sipuri').val(''); */
+							 $('#friend').val('');
+							  
+							    },  
+							    error: function(e){  
+							      alert('Error: ' + e);  
+							    }  
+							  });  
+							}  
+						</script>
 
-function addToFriendList()
-{
-		var notFriend1=$('#notfriend').val();
-		    var sipuri=$('#privateIdentity').val();
-		    /* alert (" contact data "+ sipuri+"" + notFriend1); */
-		    $.ajax({  
-			    type: "POST",  
-			    url: "/sdnext/addcontactajax.html",  
-			    data: "sipuri=" + sipuri + "&friend=" + notFriend1,  
-			    success: function(response){  							     
-			//      $('#infocontact').html(response);
-			   		document.getElementById("frndDiv").innerHTML="";
-					document.getElementById("notFrndDiv").innerHTML="";
-
-			   		var jsonObject=new Object();
-			   		jsonObject=eval('('+response+')');
-					
-		
-				    	var table=$('<table align="left" border="1"  style="color:black;"></table>');
-				    	var tr=$('<tr></tr>');
-				    	$.each(jsonObject.Friends, function(key, val) {
-
-						var tr=$('<tr></tr>');
-				    	$.each(val, function(k, v){
-				    		$('<td>').appendTo(tr);		
-				    		$('<input type="radio" name="friend" id="friend" value='+v+' onclick="showDetail();" ><font><c:out value="${contact.friend}"/></font><br>').appendTo(tr);
-				    		$('</td>').appendTo(tr);				
-				    		tr.appendTo(table);
-				    	 });
-				    	});
-				    	table.appendTo('#frndDiv');
-				    	
-
-				    	var table=$('<table align="left" border="1"  style="color:black;"></table>');
-				    	var tr=$('<tr></tr>');	
-				    	$.each(jsonObject.Friends, function(key, val) {	
-				    	$.each(val, function(k, v){		
-				    		$('<td>').appendTo(tr);		
-				    		$('<input type="radio" name="friend" id="friend" value='+v+' onclick="showDetail();" ><font><c:out value="${contact.friend}"/></font><br>').appendTo(tr);
-				    		$('</td>').appendTo(tr);				
-				    		tr.appendTo(table);
-				    	 });
-				    	});
-				    	table.appendTo('#notFrndDiv');
-			  	
-			    },
-			    error: function(e){  
-			      alert('Error: ' + e);  
-			    }
-			  })
-		}
-	
-		function removeFrnd(){
-			 var sipuri=$('#privateIdentity').val();
-			 var friend=$('#friend').val();
-			/*  alert (" contact data "+ sipuri+"" + friend); */
-			    $.ajax({  
-				    type: "POST",  
-				    url: "/sdnext/deletecontact.html",  
-				    data: "sipuri=" + sipuri + "&friend=" + friend,  
-
-					success: function(response){  							     
-				      $('#infocontact').html(response);
-				   		
-				 	  $('#friend').val('');
-				  
-				    },  
-				    error: function(e){  
-				      alert('Error: ' + e);  
-				    }
-
-				})
-				}
-		function showDetail(){
-			
-			 var friend=$("input:radio[name=friend]:checked").val();
-			/*  alert (" show data "+friend); */
-			    $.ajax({  
-				    type: "POST",  
-				    url: "/sdnext/showuserdetail.html",  
-				    data: "friend=" + friend,  
-				    success: function(response){ 
-				    	$("#displayDetails").css('display','');
-				   		var jsonObject=new Object();
-				   		jsonObject=eval('('+response+')');
-				    	document.getElementById("displayName1").value=jsonObject.JsonFriend.displayName ; 
-						document.getElementById("publicIdentity1").value=jsonObject.JsonFriend.publicIdentity ; 
-						document.getElementById("privateIdentity1").value=jsonObject.JsonFriend.privateIdentity ; 
-						document.getElementById("realm1").value=jsonObject.JsonFriend.realm ;	
-				    },  
-				    error: function(e){  
-				      alert('Error: ' + e);  
-				    }
-				  });
-				}
-		
-		
-			</script>
+		<form:form method="POST" action="/sdnext/savecontact.html">
+	   		<table>
+			    <tr>
+			        <td><form:label path="sipuri">Sipuri :</form:label></td>
+			        <td><form:input path="sipuri" value="${contact.sipuri}" /></td>
+			    </tr>
+ <tr>
+			        <td><form:hidden path="friend" />
+			       <td><form:input type="hidden" path="friend" value="${contact.friend}" /></td> 
+			    </tr>  
+			    <tr>
+			        <td><form:label path="friend">Friend :</form:label></td>
+			        <td><form:input path="friend" value=""/></td>
+			    </tr>
+			    <tr>
+			     <td><input type="button" value="Add Contact" onclick="doAjaxPostContacts()"></td>
+			   
+			   <td colspan="2"><input type="submit" value="Submit"/></td>
+		      </tr>
+			</table> 
+		</form:form>
+		 <div id="infocontact" style="color: green;"></div> 
 		
 	<c:if test="${!empty contacts}">
 		
+		
+		<h2>List Contacts</h2>
 	<table align="left" border="1"  style="color:black;">
-	
+		<tr>
+			<th>Sip Uri</th>
+			<th>Friend</th>
+		</tr>
 
 		<c:forEach items="${contacts}" var="contact">
+		<c:set var="friendlist" value="${fn:split(contact.friend, ',')}" />
+		
+<c:forEach var="friend" items="${friendlist}"> 
+   
 
 			<tr>
-			<td>			
-			    <input type="radio" name="friend" id="friend" value="${contact.friend}" onclick="showDetail();" ><font><c:out value="${contact.friend}"/></font><br>
-			</td>				
+				<td><c:out value="${contact.sipuri}"/></td>				
+				<td><c:out value="${friend}"/></td>
+				
+				<%-- <td align="center"><a href="edit.html?id=${contact.sipuri}">Edit</a> | <a href="delete.html?id=${contact.sipuri}">Delete</a></td> --%>
 			</tr>
 			</c:forEach>
 			
-		
+		</c:forEach>
 	</table>
-	</c:if>
-
-</div>				
-</div>
-<h6 style="margin-left: 20%;margin-bottom:10px;margin-top:20px;">People you may know</h6>
-<div style="margin-top: 5%;max-height:130px;overflow:auto;" id="notFrndDiv">				
-					
-	 <c:if test="${!empty userdetailsnotfriend}">
-		
-	<table align="left" border="1"  style="color:black;">
-			<c:forEach items="${userdetailsnotfriend}" var="userdetail">
-				<tr>
-			<td>
-			    <input type="radio" name="notfriend" id="notfriend" value="${userdetail.privateIdentity}" ><font><c:out value="${userdetail.privateIdentity}"/></font><br>
-				</td>				
-			</tr>
-			</c:forEach>
-			
-	</table>
-</c:if>	 
-</div>
-</div>				
-		
-	 <div style="height: 30%;">
-			<button style="width: 50px; margin-right: 5px;" id="call" class="button" onclick="callFunc();">Call</button>
-			<!-- <button style="width: 60px; margin-right: 5px;" id="message" class="button" onclick="messageFunc();">Message</button> -->
-			<button style="width: 50px; margin-right: 5px;"id="removeFrnd" onclick="removeFrnd();"  class="button">Remove</button>
-			<button style="width: 50px; margin-right: 5px;" id="add" onclick="addToFriendList();" class="button">Add </button>
-	
-	
-<div style="height: 65%;display:none;" id="displayDetails">
-				<table style="margin-top:5%;">
-					<tr><td><label>Name: </label></td>
-			    	    <td><input style="border: none;" type="text" id="displayName1" name="displayName1"  class="round full-width-input" readonly="readonly"/></td>		
-					</tr>
-					<tr><td><label >PublicIdentity: </label></td>
-						<td><input style="border: none;" type="text" id="publicIdentity1" name="publicIdentity1"  class="round full-width-input" readonly="readonly" /></td>
-					</tr>
-					<tr><td><label >PrivateIdentity: </label></td>
-					<td><input style="border: none;" type="text" id="privateIdentity1" name="privateIdentity1"  class="round full-width-input" readonly="readonly"/></td>
-					</tr>
-					<tr><td><label>Realm: </label></td>
-					<td><input style="border: none;" type="text" id="realm1" name="realm1" class="round full-width-input" readonly="readonly"/></td>
-					</tr>		
-					<tr><td></td><td><img id="friendImage"  style="width:100px;height: 100px;border-radius:10px "></td>
-					</tr>
-				</table>
-			</div>
+</c:if>
+	 
 	</div>
-
-	</div>
-
 	<!-- friendList ends here -->		
 	
 	<div id="geoLocationModal" class="reveal-modal xxlarge">
@@ -2380,9 +2278,10 @@ function addToFriendList()
 					<a href="#" data-reveal-id="userProfile" data-animation="fade">
 						<div class="tile large live" data-stops="0" data-speed="3000" data-delay="0" data-direction="horizontal" data-stack="true">
 							<div class="live-front">
-								<img id="userImage1" class="live-img" src="User-Images/${userdetail.displayName}.png">
+								<img id="userImage1" class="live-img"/>
 							</div>
-							<span class="tile-cat red" id="spanId">Welcome </span>
+							<span class="tile-cat red" id="spanId">Welcome 				
+						</span>
 						</div>
 					</a>
 
@@ -2550,7 +2449,7 @@ function addToFriendList()
                         <label style="height: 100%">WebSocket Server URL<sup><a href="#aWebSocketServerURL">[2]</a></sup>:</label>
                     </td>
                     <td>
-                        <input type="text" style="width: 100%; height: 100%" id="txtWebsocketServerUrl" value="ws://10.1.5.19:443"  />
+                        <input type="text" style="width: 100%; height: 100%" id="txtWebsocketServerUrl" value="ws://14.96.153.177:443"  />
                     </td>
                 </tr>
                 <tr>
@@ -2558,7 +2457,7 @@ function addToFriendList()
                         <label style="height: 100%">SIP outbound Proxy URL<sup><a href="#aSIPOutboundProxyURL">[3]</a></sup>:</label>
                     </td>
                     <td>
-                        <input type="text" style="width: 100%; height: 100%" id="txtSIPOutboundProxyUrl" value="udp://10.1.5.19:5060"  />
+                        <input type="text" style="width: 100%; height: 100%" id="txtSIPOutboundProxyUrl" value="udp://14.96.153.177:5060"  />
                     </td>
                 </tr>
                 <tr>

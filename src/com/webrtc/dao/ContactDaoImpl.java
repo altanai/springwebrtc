@@ -14,7 +14,7 @@ public class ContactDaoImpl implements ContactDao {
 
 	@Autowired
 	private SessionFactory sessionFactory;
-
+	
 	@Override
 	public void addContact(Contact contact) {
 		// TODO Auto-generated method stub
@@ -22,33 +22,23 @@ public class ContactDaoImpl implements ContactDao {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Contact> listContactss(String sipuri) {
+	public List<Contact> listContactss() {
 		// TODO Auto-generated method stub
-
-	//	return (List<Contact>) sessionFactory.getCurrentSession()
-	//			.createCriteria(Contact.class).list();
 		
-		return  (List<Contact>) sessionFactory.getCurrentSession().createCriteria(Contact.class, sipuri).list();
+		return (List<Contact>) sessionFactory.getCurrentSession().createCriteria(Contact.class).list();
 
 	}
 
 	@Override
 	public Contact getContact(String sipuri) {
 		// TODO Auto-generated method stub
-		return (Contact) sessionFactory.getCurrentSession().get(Contact.class,sipuri);
+		return (Contact) sessionFactory.getCurrentSession().get(Contact.class, sipuri);
 	}
 
 	@Override
 	public void deleteContact(Contact contact) {
 		// TODO Auto-generated method stub
-		sessionFactory
-				.getCurrentSession()
-				.createQuery(
-						"DELETE FROM Contact WHERE contactsipuri = '"
-								+ contact.getContactsipuri()
-								+ "' and contactfriend='"
-								+ contact.getContactfriend() + "'")
-				.executeUpdate();
+		sessionFactory.getCurrentSession().createQuery("DELETE FROM Conatct WHERE contactsipuri = "+contact.getContactsipuri()).executeUpdate();
 
 	}
 

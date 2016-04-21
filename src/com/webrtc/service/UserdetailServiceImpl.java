@@ -1,7 +1,5 @@
 package com.webrtc.service;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,9 +43,8 @@ public class UserdetailServiceImpl implements UserdetailService {
 		return userdetailDao.listUserdetailss();
 	}
 
-	public List<Userdetail> loginUserdetail(String sipuri, String password)   {
+	public List<Userdetail> loginUserdetail(String sipuri, String password) {
 	
-		List<Userdetail> userdetailobj=null;
 		// TODO Auto-generated method stub
 		/*Userdetail userdetailobj= new Userdetail();
 		userdetailobj = userdetailDao.getUserdetail(sipuri);
@@ -61,15 +58,8 @@ public class UserdetailServiceImpl implements UserdetailService {
 		}
 		
 		return (List<Userdetail>) userdetailobj;*/
-		byte []encryptedPassword=null;
-		MessageDigest md5;
-		try {
-			md5 = MessageDigest.getInstance("MD5");
+		List<Userdetail> userdetailobj=userdetailDao.loginUserdetail(sipuri, password);
 		
-		encryptedPassword=md5.digest(password.getBytes());
-		userdetailobj=userdetailDao.loginUserdetail(sipuri, password);
-		
-
 		if(userdetailobj==null||userdetailobj.size()==0){
 			return null;
 		}
@@ -77,21 +67,8 @@ public class UserdetailServiceImpl implements UserdetailService {
 				||(!userdetailobj.get(0).getUserdetailpassword().equalsIgnoreCase(password))){
 			return null;
 		}
-		
-		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			System.out.println("Md5 algorithim exception");
-			e.printStackTrace();
-		}
 		return (List<Userdetail>) userdetailobj;
 		
 		/*return userdetailDao.loginUserdetail(sipuri,password);*/
-	}
-	
-	
-	@Override
-	public List<Userdetail> listUserdetailNotFriend(Userdetail userdetail) {
-	// TODO Auto-generated method stub
-	return userdetailDao.listUserdetailNotFriend(userdetail);
 	}
 }

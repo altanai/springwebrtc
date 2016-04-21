@@ -3,8 +3,6 @@ package com.webrtc.bean;
 import java.sql.Date;
 import java.sql.Time;
 
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
-
 public class AllinoneBean {
 
 	private String privateIdentity;
@@ -26,23 +24,6 @@ public class AllinoneBean {
 	private Time time;
 	
 	private String friend;
-	
-	
-	private String fileName;
-	private CommonsMultipartFile fileData;
-
-	public CommonsMultipartFile getFileData() {
-		return fileData;
-	}
-	public void setFileData(CommonsMultipartFile fileData) {
-		this.fileData = fileData;
-	}
-	public String getFileName() {
-		return fileName;
-	}
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
 	
 	public String getPrivateIdentity() {
 		return privateIdentity;

@@ -15,12 +15,7 @@ public interface UserdetailDao {
 	public void deleteUserdetail(Userdetail userdetail);
 	
 	public List<Userdetail> loginUserdetail(String sipuri, String password);
-
-	/**
-	 * @param userdetail
-	 * @return
-	 */
-	public List<Userdetail> listUserdetailNotFriend(Userdetail userdetail);
-
-
+	
+	
+	
 }

@@ -8,7 +8,7 @@ public interface ContactService {
 	
 	public void addContact(Contact contact);
 
-	public List<Contact> listContactss(String sipuri);
+	public List<Contact> listContactss();
 	
 	public Contact getContact(String sipuri);
 	

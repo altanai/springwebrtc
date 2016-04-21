@@ -26,15 +26,14 @@ public class ContactServiceImpl implements ContactService {
 	}
 
 	@Override
-	public List<Contact> listContactss(String sipuri) {
+	public List<Contact> listContactss() {
 		// TODO Auto-generated method stub
-		return contactDao.listContactss(sipuri);
+		return contactDao.listContactss();
 	}
 
 	@Override
 	public Contact getContact(String sipuri) {
 		// TODO Auto-generated method stub
-		
 		return contactDao.getContact(sipuri);
 	}
 

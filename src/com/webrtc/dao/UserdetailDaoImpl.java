@@ -47,7 +47,7 @@ public class UserdetailDaoImpl implements UserdetailDao {
 	public List<Userdetail> loginUserdetail(String sipuri,String password) {
 		// TODO Auto-generated method stub
 		/*return (Userdetail) sessionFactory.getCurrentSession().get(Userdetail.class, sipuri);*/
-		
+		System.out.println(sipuri + password);
 		Criteria crit = sessionFactory.getCurrentSession().createCriteria(
 				Userdetail.class);
 		Criterion name = Restrictions.eq("userdetailprivateIdentity", sipuri);
@@ -59,23 +59,6 @@ public class UserdetailDaoImpl implements UserdetailDao {
 		System.out.println(l);
 		return l;
 }
-	
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<Userdetail> listUserdetailNotFriend(Userdetail userdetail) {
-		// TODO Auto-generated method stub
-
-		return sessionFactory
-				.getCurrentSession()
-				.createQuery(
-						"From Userdetail where userdetailprivateIdentity not in (select contactfriend from Contact where contactsipuri='"
-								+ userdetail.getUserdetailprivateIdentity()
-								+ "') AND userdetailprivateIdentity not in( '"
-								+ userdetail.getUserdetailprivateIdentity()
-								+ "')").list();
-
-	}
-	
 	}
 
 

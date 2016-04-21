@@ -252,8 +252,31 @@
         //sipUnRegister();
          return '';        //comment out 'return' to suppress prompt
     }
+    //read server ip from file
+   var ip;
+   function readip()
+   {
+	   var pathOfFileToRead = "presentation_server_config.txt";
+	   ip = FileHelper.readStringFromFileAtPath
+	   	(
+	   		pathOfFileToRead
+	   	);
+   } 
 
-  
+   function FileHelper()
+   {
+	   	FileHelper.readStringFromFileAtPath = function(pathOfFileToReadFrom)
+	   	{
+	   		var request = new XMLHttpRequest();
+	   		request.open("GET", pathOfFileToReadFrom, false);
+	   		request.send(null);
+	   		var returnValue = request.responseText;
+	   		return returnValue;
+	   	}
+	   	readip();
+	 
+   }
+   
    function sendDataToDiv(from,message)
 	{
 	
@@ -261,8 +284,17 @@
 			$('.chatbox').append(text);
 			$(text).gemoticon();
 	}
-
-   main('empty');
+   
+    //fetch buddy list
+    function main(param)
+ 	{	 	
+	} 
+     
+    function FileHelper()
+    {
+    }
+    
+    main('empty');
     
     function postInit() {
         // check webrtc4all version
@@ -541,7 +573,7 @@
     
   //presence
 	function sipPublis(s_type) {
-		//alert("publish called ");
+		alert("publish called ");
 		oSipPublish = oSipStack.newSession('publish', {
 			expires : 100,
 			sip_headers : [ {
@@ -584,13 +616,11 @@
 		},90000);
 	//subscribe
 	function sipSubscribe() {
-		//alert(" subscribe called ");
-
-		<c:if test="${!empty contacts}">
-
-			<c:forEach items="${contacts}" var="contact">
-
-			oConfigSub = {
+		alert(" subscribe called ");
+		for(var i=0;i<friendslist.length;i++)
+			 {
+			 	
+				oConfigSub = {
 					expires : 100,
 					events_listener : {
 						events : '*',
@@ -615,18 +645,12 @@
 					} ]
 		
 				};
-
-			  //  alert("subscribe for ${contact.friend} ");
-			    
-			    console.info('SUBSCRIBE  to =${contact.friend}');
-			    
-				subscribeSession = oSipStack.newSession("subscribe", oConfigSub);					
-				subscribeSession.subscribe("${contact.friend}" );
-
-			</c:forEach>
-
-		</c:if>
-
+		
+				subscribeSession = oSipStack.newSession("subscribe", oConfigSub);
+					to[i]=friendslist[i];
+					subscribeSession.subscribe(to[i]);
+					
+			}
 	}	
 	//subscribe ends
     
@@ -938,7 +962,61 @@
         
     }
     
-   
+    function sendDataToUpload() //This function makes use of AJAX To Call the Servlet
+    {
+    	if(arr[0]!=null && arr[1]!=null && arr[2]!=null && arr[3]!=null){
+	    	xmlHttpRequest.open("POST", "SipCallLogServlet?caller="+arr[0]+"&callee="+arr[1]+"&startTime="+arr[2]+"&endTime="+arr[3], true);
+	    	xmlHttpRequest.onreadystatechange=receiveMessageFromServerLogs;
+	    	xmlHttpRequest.send();
+    	}
+    }
+    function receiveMessageFromServerLogs()
+	{
+		if(xmlHttpRequest.readyState==4&&xmlHttpRequest.status==200)
+			{
+			document.getElementById("displayLogs").innerHTML=""; //clear html
+		
+			var table=$('<table id="results" class="table1 table"><tr><th>Caller</th><th>Callee</th><th>Date</th><th>Start Time</th><th>End Time</th></tr></table>');
+			var jsonResponseFromServerLogs=eval('('+xmlHttpRequest.responseText+')');
+			var i=0;
+			
+			$.each(jsonResponseFromServerLogs.logs, function(key, val) {
+				 var tr=$('<tr></tr>');
+				 i++;		
+				 var caller,callee,stime,etime,day;
+				$.each(val, function(k, v){
+							
+					if(k.match("caller")){
+						 caller=$('<td>'+ v+'</td>');
+					}					
+					else if(k.match("callee")){
+						 callee=$('<td>'+ v+'</td>');
+					}
+					else if(k.match("dayOfCall")){
+						 day=$('<td>'+ v+'</td>');
+					}
+					else if(k.match("startTime")){
+						 stime=$('<td>'+ v+'</td>');
+					}
+					else if(k.match("endTime")){
+						 etime=$('<td>'+ v+'</td>');
+					}	
+
+		    	});
+				callee.appendTo(tr);
+				caller.appendTo(tr);
+				day.appendTo(tr);
+				stime.appendTo(tr);
+				etime.appendTo(tr);
+				tr.appendTo(table);
+			});
+			table.appendTo('#displayLogs');
+			var pager = new Pager('results', 10);
+			pager.init();
+			pager.showPageNav('pager', 'pageNavPosition');
+			pager.showPage(1);
+			}
+	}
     
     function shareMyLocation(){
     	user = document.getElementById("user").value;
@@ -1230,7 +1308,7 @@
                 } // 'terminating' | 'terminated'
 
             case 'i_notify': {
-             //   alert("i_notify called ");
+                alert("i_notify called ");
 				console.info('NOTIFY content = ' + e.getContentString());
 				console.info('NOTIFY content-type = ' + e.getContentType());				
 				
@@ -1261,8 +1339,6 @@
 								      var check = noteNode.textContent;
 									  var contactNode=tupleNode.getElementsByTagName ("contact")[0];
 									  var contactUri=contactNode.textContent;
-
-									 alert("Presence  contact uri = " + contactUri);
 	
 										if (statusNode) {
 											
@@ -1273,22 +1349,16 @@
 															var basicValue=basicNode.textContent;
 															if(basicValue==="open"){
 																userStatus="online";
-																console.info('Presence notification: Uri = '
-																		+ contactUri
-																		+ ' status = online ');
 																doAjaxPostPresence(contactUri,userStatus );
 														    }
 															else{
 																userStatus="offline";
-																console.info('Presence notification: Uri = '
-																		+ contactUri
-																		+ ' status = online ');
 																doAjaxPostPresence(contactUri,userStatus );
 															}
-												/* console.info('Presence notification: Uri = '
-																+ contactUri
+												console.info('Presence notification: Uri = '
+																+ entityUri
 																+ ' status = '
-																+ basicNode.textContent); */
+																+ basicNode.textContent);
 											}
 										}
 									}
@@ -1499,7 +1569,7 @@
 		  var sipuri = sipuri;
 		  var status = status;
 
-	     // alert( "Prsence post ajax "+ sipuri+ " "+ status);
+		  alert( sipuri+ " "+ status);
 		  
 		  $.ajax({  
 		    type: "POST",  
@@ -1515,64 +1585,6 @@
 		    }  
 		  });  
 		}  
-
-
-    function doAjaxFetchPresence(sipuri ) {  
-
-		  var sipuri = sipuri;
-		  var status = status;
-
-	     alert( "Presence fetch ajax "+ sipuri+ " "+ status);
-		  
-		  $.ajax({  
-		    type: "POST",  
-		    url: "/sdnext/fetchpresenceajax.html",  
-		    data:  "sipuri=" + sipuri ,
-
-		    success: function(response){  
-			    /* document.getElementById("friendtable")..getElementsByTagName("tr"); */
-				alert(" sipuri "+ sipuri + " resposne " + response;)
-			 <c:choose>	
-				<c:when  test="${response.equalsIgnoreCase(online)}">
-
-				 document.getElementById(sipuri+"status").innerHTML='<img src="<c:url value="resources/metroui/images/online.gif"/>" style="width: 10px;height: 10px;">';
-					
-		/* 		
-				<td id="${contact.friend}status"><img src="<c:url value="resources/metroui/images/offline.gif"/>" style="width: 10px;height: 10px;"></td>
- */				</c:when>
-				<c:otherwise>
-
-				 document.getElementById(sipuri+"status").innerHTML='<img src="<c:url value="resources/metroui/images/offline.gif"/>" style="width: 10px;height: 10px;">';
-					
-	/* 			<td id="${contact.friend}status"><img src="<c:url value="resources/metroui/images/online.gif"/>" style="width: 10px;height: 10px;"></td>			
- */				</c:otherwise>
-			</c:choose>	
-			
-								     
-		    },  
-		    error: function(e){  
-		      alert('Error: ' + e);  
-		    }  
-		  });  
-		}
-
-
-
-	function fetchpresenceloop(){
-		
-	<c:forEach items="${contacts}" var="contact">
-	<c:set var="friendlist" value="${fn:split(contact.friend, ',')}" />								
-		<c:forEach var="friend" items="${friendlist}"> 
-		doAjaxFetchPresence(${friend}.val());										
-		</c:forEach>												
-	</c:forEach>	
-	}		
-		
-
- 	var presenceTimer=setInterval(function(){
- 		fetchpresenceloop();
-	},90000);
-
     
 </script>
 
@@ -1583,28 +1595,23 @@ function create( template, vars, opts ){
 
 	
 
- var refreshId2 = setInterval(function(){
+var refreshId2 = setInterval(function(){
 	$containerN = $("#containerNote").notify();	
+
 		$.ajax({
 			type:"POST",
-			url:'/sdnext/getFreshNotifications.html',
-			data:{userId:$("#txtPublicIdentity").val()},
+			url:'getFreshNotifications.html',
+			data:{userId:$("#txtPrivateIdentity").val()},
 		 	success:function(data)
 		 	{
-			 	var jsonNotifcation=new Object();
-			 	jsonNotification=eval('('+data+')');
-			 	//alert(jsonNotification.Notifications);
 		 		$("#containerNote").html('');
-		    		$.each(jsonNotification.Notifications, function(key, val) {
-							//alert("inside loop");
-			 			 if(val.TYPE.match("VOICEMAIL")){
+		    		$.each(data.Notifications, function(key, val) {
+		 			/*  if(val.TYPE.match("VOICEMAIL")){
 		 				 create("withIcon", { title:'New VoiceMail Received!', text:val.DETAILS+' <a style="color:white;text-decoration:underline; cursor: pointer;"  id="'+val.ID+'" class="ui-notify-close" onclick="updateStatusVoiceMail(this);">Listen</a>', icon:'info.png' },{ 
 				 			 expires:false
-		 					});
-		 				 } 
-	 				 
+		 				});
+		 				 } */
 		 				  if(val.TYPE.match("CONFERENCE")){
-		 					// alert(val.TYPE);
 		 					 create("withIcon", { title:'Conference Invite!', text:val.DETAILS+'  <a style="color:white;text-decoration:underline; cursor: pointer;"  id="'+val.ID+'" class="ui-notify-close" onclick="updateStatusConference(this);">Join</a> <a style="color:white;text-decoration:underline; cursor: pointer;"  id="'+val.ID+'" class="ui-notify-close" onclick="declineConference(this);">Decline</a>', icon:'info.png' },{ 
 					 			 expires:false
 			 				});
@@ -1633,7 +1640,7 @@ alert("User details fetched "+ document.getElementById(txtRealm).value+ " "+ doc
 <script>
 
 function videoConf(){
-	window.open('${pageContext.request.contextPath}/conferencing.html','window','width:750,height:500');
+	window.open('https://localhost:8443/sdnext/conferencing.html','window','width:750,height:500');
 }	
 
 </script>
@@ -1643,31 +1650,21 @@ function videoConf(){
 	<div class="header">	
 		<p>	<img src="<c:url value="resources/metroui/images/TCSLogo.jpg"/>"/>
 			Unified Communicator
-			<!-- <a class="header-anchor" href="dologout.html" onclick="stopStack();"><font color="#ffffff">Logout</font></a> -->		
-		   <a class="header-anchor" href='<c:url value="/j_spring_security_logout" />' onclick="stopStack();"><font color="#ffffff">Logout</font></a>
+			<a class="header-anchor" href="dologout.html" onclick="stopStack();"><font color="#ffffff">Logout</font></a>		
 		</p>		
 	</div>
 	<div class="navbar" align="center" style="display:none;">
-		
 		<input type="button" class="btn" value="Enable Calls" id="btnRegister"
 			style="width: 100px;" onclick='sipRegister();' /> 			
-		
 		<input type="button" id="btnUnRegister" class="btn" style="width: 140px;"
 			value="Go in Offline Mode" disabled onclick='dummyUnregister();' />
-		
 		<input type="button" class="btn" value="Publish My Status"
 			style="width: 130px;" onclick='sipPublis("publish")' />
-		
 		<input type="button" class="btn" style="width: 100px;" value="Check Status"
 			onclick='sipSubscribe()' /> 
-		
 		<input type="button" class="btn" style="width: 100px;" value="Settings"
 			onclick='openSettings()' /> 
 	</div>
-	
-	
-
-	
 	
 	  <div id="callModal" class="reveal-modal xxlarge">
 		<h2>Instant Connect</h2>
@@ -1678,21 +1675,25 @@ function videoConf(){
 								<h6 style="margin-left:20%;">People in your phone book</h6>
 								<div id="callContacts" class="span6 well" style="height:30%;overflow:auto;">
 								<c:if test="${!empty contacts}">
-								<table align="left" border="1">
-							
-									<c:forEach items="${contacts}" var="contact">
-									<c:set var="friendlist" value="${fn:split(contact.friend, ',')}" />								
-									<c:forEach var="friend" items="${friendlist}"> 
-												<tr>												
-													<td><c:out value="${friend}"/></td>	
-													<td id="'+v+'status"> <img src="<c:url value="resources/metroui/images/offline.gif"/>" style="width: 10px;height: 10px;"></td>									
-													<%-- <td align="center"><a href="edit.html?id=${contact.sipuri}">Edit</a> | <a href="delete.html?id=${contact.sipuri}">Delete</a></td> --%>
-												</tr>
-												</c:forEach>
-												
-									</c:forEach>
-								</table>
-							</c:if>
+	<table align="left" border="1">
+
+		<c:forEach items="${contacts}" var="contact">
+		<c:set var="friendlist" value="${fn:split(contact.friend, ',')}" />
+		
+<c:forEach var="friend" items="${friendlist}"> 
+   
+
+			<tr>	
+			
+				<td><c:out value="${friend}"/></td>
+				
+				<%-- <td align="center"><a href="edit.html?id=${contact.sipuri}">Edit</a> | <a href="delete.html?id=${contact.sipuri}">Delete</a></td> --%>
+			</tr>
+			</c:forEach>
+			
+		</c:forEach>
+	</table>
+</c:if>
 								
 								</div>
 								<!-- <input type="button" onclick="incrementValue()" value="Increment Value" />
@@ -1700,7 +1701,9 @@ function videoConf(){
 									<div id="notification" style="width:20px;height:15px;">
 										<div id="number1" style="margin:0 auto;color:white;"></div>
 									</div> -->
-	
+									
+									
+									
 							      <div id="divMsgCtrl" class="span6 well" style='display:table-cell;' style=" background-color:#DDA0DD; position:fixed;">
 							 		<table border ="0">
 									<tr><td width="50px" style="color:black">To:</td><td><input type="text" style="width:100%;" id="uri" placeholder="Enter username eg: John"  /></td></tr>
@@ -1856,15 +1859,9 @@ function videoConf(){
 						      </tr>
 							</table> 
 						</form:form>
-
-						<form:form action="/sdnext/updateProfilePic.html" name="frm" method="POST" enctype="multipart/form-data">
-						<table>
-						<tr>
-						<td><form:input path="fileData" id="image" type="file" /></td>  
-						<td colspan="4" align="center"><input type="submit" value="Upload" /></td>
-						</tr>
-						</table>						
-						</form:form>
+						<input type="file" id="profilePic" name="profilePic">
+						<button onclick="updateProfilePic()">UpdatePic</button>
+						
 							
 						<script type="text/javascript">
 						function doAjaxPostOpenid() {  
@@ -1874,7 +1871,7 @@ function videoConf(){
 							  var google = $('#google').val();
 							  var yahoo = $('#yahoo').val();
 
-							//  alert( sipuri+ " "+ facebook +" "+ google+ " "+ yahoo);
+							  alert( sipuri+ " "+ facebook +" "+ google+ " "+ yahoo);
 							  
 							  $.ajax({  
 							    type: "POST",  
@@ -1898,6 +1895,23 @@ function videoConf(){
 							  });  
 							}  
 
+						function updateProfilePic(){
+							
+						var file=document.getElementById("profilePic").files[0];
+						var formData=new FormData();
+						alert(file.name);
+						formData.append("picFile",file);
+							var xmlHttp=new  XMLHttpRequest();
+							alert("xml Request");
+							xmlHttp.open("POST","updateProfilePic.html",false);
+							xmlHttp.onreadystatechange=function(){
+								if(xmlHttp.readyState==4&&xmlHttp.status==200){
+									alert("Profile-Pic updated");
+									}
+								}
+							xmlHttp.send(formData);
+							alert("XmlRequestSent");
+							}
 						</script>
 						
 						
@@ -1922,7 +1936,7 @@ function videoConf(){
 							    </tr>
 							    <tr>
 							      <td><input type="button" value="Add Users" onclick="doAjaxPostOpenid()"></td>
-							      <!-- <td colspan="2"><input type="submit" value="Submit"/></td> -->
+							      <td colspan="2"><input type="submit" value="Submit"/></td>
 						      </tr>
 							</table> 
 						</form:form>
@@ -1931,200 +1945,150 @@ function videoConf(){
 	</div>
 	<!--userProfile ends here  -->
 	
-	<div id="friendList" class="reveal-modal-contacts" >
-	<h2>Your Contacts</h2>	
-	<a class="close-reveal-modal">&#215;</a>
-	<div style="width: 45%; float: left;margin-top:20px;">
-			<div style="height:45%;max-height:10%;">		
-				<div style="height: 4%;">&nbsp;&nbsp;&nbsp;<span style="color: red;" id="user-error"></span></div>
-				<h6 style="margin-left:20%;height:6%;margin-bottom:10px;">People in your phone book</h6>
-				<div style="padding-top:2%;max-height:130px;overflow:auto;" id="frndDiv">	
-	
+<div id="friendList" class="reveal-modal-contacts" >
+    <h2>Your Contacts</h2>    
+    <a class="close-reveal-modal">&#215;</a>
+    <div style="width: 45%; float: left;margin-top:20px;">
+            <div style="height:45%;max-height:10%;">        
+                <div style="height: 4%;">&nbsp;&nbsp;&nbsp;<span style="color: red;" id="user-error"></span></div>
+                <h6 style="margin-left:20%;height:6%;margin-bottom:10px;">People in your phone book</h6>
+                <div style="padding-top:2%;max-height:130px;overflow:auto;" id="frndDiv">    
+    
 <script type="text/javascript">
 
 function addToFriendList()
 {
-		    /* var notFriend1=$('#notfriend').val(); */
+        var notFriend1=$('#notfriend').val();
+            var sipuri=$('#privateIdentity').val();
+            /* alert (" contact data "+ sipuri+"" + notFriend1); */
+            $.ajax({  
+                type: "POST",  
+                url: "/sdnext/savecontact.html",  
+                data: "sipuri=" + sipuri + "&friend=" + notFriend1,  
+                success: function(response){                                   
+                  $('#infocontact').html(response);
+                       
+              $('#notfriend').val('');
+              
+                },  
+                error: function(e){  
+                  alert('Error: ' + e);  
+                }
+              })
+        }
+    
+        function removeFrnd(){
+             var sipuri=$('#privateIdentity').val();
+             var friend=$('#friend').val();
+            /*  alert (" contact data "+ sipuri+"" + friend); */
+                $.ajax({  
+                    type: "POST",  
+                    url: "/sdnext/deletecontact.html",  
+                    data: "sipuri=" + sipuri + "&friend=" + friend,  
+                    success: function(response){                                   
+                      $('#infocontact').html(response);
+                           
+                  $('#friend').val('');
+                  
+                    },  
+                    error: function(e){  
+                      alert('Error: ' + e);  
+                    }
+                  })
+                }
+        function showDetail(){
+            
+             var friend=$("input:radio[name=friend]:checked").val();
+            /*  alert (" show data "+friend); */
+                $.ajax({  
+                    type: "POST",  
+                    url: "/sdnext/showuserdetail.html",  
+                    data: "friend=" + friend,  
+                    success: function(response){ 
+                        $("#displayDetails").css('display','');
+                           var jsonObject=new Object();
+                           jsonObject=eval('('+response+')');
+                        document.getElementById("displayName1").value=jsonObject.JsonFriend.displayName ; 
+                        document.getElementById("publicIdentity1").value=jsonObject.JsonFriend.publicIdentity ; 
+                        document.getElementById("privateIdentity1").value=jsonObject.JsonFriend.privateIdentity ; 
+                        document.getElementById("realm1").value=jsonObject.JsonFriend.realm ;    
+                    },  
+                    error: function(e){  
+                      alert('Error: ' + e);  
+                    }
+                  });
+                }
+        
+        
+            </script>
+        
+    <c:if test="${!empty contacts}">
+        
+    <table align="left" border="1"  style="color:black;">
+    
 
-		    var notFriend1=$("input:radio[name=notfriend]:checked").val();
-		    var sipuri=$('#privateIdentity').val();
-		    alert (" contact data "+ sipuri+" " + notFriend1); 
-		    $.ajax({  
-			    type: "POST",  
-			    url: "/sdnext/addcontactajax.html",  
-			    data: "sipuri=" + sipuri + "&friend=" + notFriend1,  
-			    success: function(response){  							     
-			//      $('#infocontact').html(response);
-			   		document.getElementById("frndDiv").innerHTML="";
-					document.getElementById("notFrndDiv").innerHTML="";
+        <c:forEach items="${contacts}" var="contact">
+        
+        
 
-			   		var jsonObject=new Object();
-			   		jsonObject=eval('('+response+')');
-					
-		
-				    	var table=$('<table align="left" border="1"  style="color:black;"></table>');
-				    	var tr=$('<tr></tr>');
-				    	$.each(jsonObject.Friends, function(key, val) {
-						var tr=$('<tr></tr>');
-				    	$.each(val, function(k, v){
-				    		$('<td>').appendTo(tr);		
-						/* 		$('<input type="radio" name="friend" id="friend" value='+v+' onclick="showDetail();" ><font>'+v+'</font><br>').appendTo(tr);
- 						*/
-
-
-				    		if(k.match("Friendsipuri")){
-				    			$('<input type="radio" name="friend" id="friend" value='+v+' onclick="showDetail();" ><font>'+v+'</font><br>').appendTo(tr);
-							}
-							else{
-								if("offline".match(v)){
-									$('<td id="'+v+'status"><img src="<c:url value="resources/metroui/images/offline.gif"/>" style="width: 10px;height: 10px;"></td>').appendTo(tr);
-								}
-								else
-								{
-									$('<td id="'+v+'status"><img src="<c:url value="resources/metroui/images/online.png"/>" style="width: 10px;height: 10px;"></td>').appendTo(tr);
-								}
-							}
- 						
-					
- 				    		$('</td>').appendTo(tr);				
-				    		tr.appendTo(table);
-				    	 });
-				    	});
-				    	table.appendTo('#frndDiv');
-				    	
-
-				    	var table=$('<table align="left" border="1"  style="color:black;"></table>');
-				    	
-				    	$.each(jsonObject.NotFriends, function(key, val) {	
-				    	var tr=$('<tr></tr>');	
-				    	$.each(val, function(k, v){		
-				    		$('<td>').appendTo(tr);		
-/* 				    		$('<input type="radio" name="friend" id="friend" value='+v+' onclick="showDetail();" ><font>'+v+'</font><br>').appendTo(tr);
- */
-                            $('<input type="radio" name="notfriend" id="notfriend" value='+v+' ><font>'+v+'</font><br>').appendTo(tr);
- 				    		$('</td>').appendTo(tr);				
-				    		tr.appendTo(table);
-				    	 });
-				    	});
-				    	table.appendTo('#notFrndDiv');
-			  	
-			    },
-			    error: function(e){  
-			      alert('Error: ' + e);  
-			    }
-			  })
-		}
-	
-		function removeFrnd(){
-			 var sipuri=$('#privateIdentity').val();
-			 var friend=$("input:radio[name=friend]:checked").val();
-			 /* var friend=$('#friend').val(); */
-			  alert (" contact data "+ sipuri+"" + friend); 
-			    $.ajax({  
-				    type: "POST",  
-				    url: "/sdnext/deletecontact.html",  
-				    data: "sipuri=" + sipuri + "&friend=" + friend,  
-
-					success: function(response){  							     
-				      $('#infocontact').html(response);
-				   		
-				 	  $('#friend').val('');
-				  
-				    },  
-				    error: function(e){  
-				      alert('Error: ' + e);  
-				    }
-
-				})
-				}
-		function showDetail(){
-			
-			 var friend=$("input:radio[name=friend]:checked").val();
-			/*  alert (" show data "+friend); */
-			    $.ajax({  
-				    type: "POST",  
-				    url: "/sdnext/showuserdetail.html",  
-				    data: "friend=" + friend,  
-				    success: function(response){ 
-				    	$("#displayDetails").css('display','');
-				   		var jsonObject=new Object();
-				   		jsonObject=eval('('+response+')');
-				    	document.getElementById("displayName1").value=jsonObject.JsonFriend.displayName ; 
-						document.getElementById("publicIdentity1").value=jsonObject.JsonFriend.publicIdentity ; 
-						document.getElementById("privateIdentity1").value=jsonObject.JsonFriend.privateIdentity ; 
-						document.getElementById("realm1").value=jsonObject.JsonFriend.realm ;	
-				    },  
-				    error: function(e){  
-				      alert('Error: ' + e);  
-				    }
-				  });
-				}
-			</script>
-		
-	<c:if test="${!empty contacts}">
-	<table align="left" border="1"  style="color:black;" id="friendtable">
-		<c:forEach items="${contacts}" var="contact">
-			<tr>
-			<td>			
-			    <input type="radio" name="friend" id="friend" value="${contact.friend}" onclick="showDetail();" ><font><c:out value="${contact.friend}"/></font><br>	
-			</td>	
-			 <td id="${contact.friend}status">		 </td>
-			
-			</tr>
-		</c:forEach>	
-	</table>
-	</c:if>
-
-</div>				
-</div>
-
+            <tr>
+            <td>            
+                <input type="radio" name="friend" id="friend" value="${contact.friend}" onclick="showDetail();" ><font><c:out value="${contact.friend}"/></font><br>
+            </td>                
+            </tr>
+            </c:forEach>
+            
+        
+    </table>
+</c:if>
+</div>                
+            </div>
 <h6 style="margin-left: 20%;margin-bottom:10px;margin-top:20px;">People you may know</h6>
-<div style="margin-top: 5%;max-height:130px;overflow:auto;" id="notFrndDiv">				
-					
-	 <c:if test="${!empty userdetailsnotfriend}">		
-	<table align="left" border="1"  style="color:black;">
-			<c:forEach items="${userdetailsnotfriend}" var="varuserdetailnotfriend">
-				<tr>
-			    <td>
-			    <input type="radio" name="notfriend" id="notfriend" value="${varuserdetailnotfriend.privateIdentity}" ><font><c:out value="${varuserdetailnotfriend.privateIdentity}"/></font><br>
-				</td>				
-			</tr>
-			</c:forEach>			
-	</table>
-</c:if>	 
-
-</div>
-</div>				
-		
-	 <div style="height: 30%;">
-			<button style="width: 50px; margin-right: 5px;" id="call" class="button" onclick="callFunc();">Call</button>
-			<!-- <button style="width: 60px; margin-right: 5px;" id="message" class="button" onclick="messageFunc();">Message</button> -->
-			<button style="width: 50px; margin-right: 5px;"id="removeFrnd" onclick="removeFrnd();"  class="button">Remove</button>
-			<button style="width: 50px; margin-right: 5px;" id="add" onclick="addToFriendList();" class="button">Add </button>
-	
-	
+            <div style="margin-top: 5%;max-height:130px;overflow:auto;" id="notFrndDiv">                
+                     <c:if test="${!empty userdetailsnotfriend}">
+        
+    <table align="left" border="1"  style="color:black;">
+            <c:forEach items="${userdetailsnotfriend}" var="userdetail">
+                <tr>
+            <td>
+                <input type="radio" name="notfriend" id="notfriend" value="${userdetail.privateIdentity}" ><font><c:out value="${userdetail.privateIdentity}"/></font><br>
+                </td>                
+            </tr>
+            </c:forEach>
+            
+    </table>
+</c:if>     
+            </div>
+            </div>                
+        
+     <div style="height: 30%;">
+            <button style="width: 50px; margin-right: 5px;" id="call" class="button" onclick="callFunc();">Call</button>
+            <!-- <button style="width: 60px; margin-right: 5px;" id="message" class="button" onclick="messageFunc();">Message</button> -->
+            <button style="width: 50px; margin-right: 5px;"id="removeFrnd" onclick="removeFrnd();"  class="button">Remove</button>
+            <button style="width: 50px; margin-right: 5px;" id="add" onclick="addToFriendList();" class="button">Add </button>
+    
+    
 <div style="height: 65%;display:none;" id="displayDetails">
-				<table style="margin-top:5%;">
-					<tr><td><label>Name: </label></td>
-			    	    <td><input style="border: none;" type="text" id="displayName1" name="displayName1"  class="round full-width-input" readonly="readonly"/></td>		
-					</tr>
-					<tr><td><label >PublicIdentity: </label></td>
-					<td><input style="border: none;" type="text" id="publicIdentity1" name="publicIdentity1"  class="round full-width-input" readonly="readonly" /></td>
-					</tr>
-					<tr><td><label >PrivateIdentity: </label></td>
-					<td><input style="border: none;" type="text" id="privateIdentity1" name="privateIdentity1"  class="round full-width-input" readonly="readonly"/></td>
-					</tr>
-					<tr><td><label>Realm: </label></td>
-					<td><input style="border: none;" type="text" id="realm1" name="realm1" class="round full-width-input" readonly="readonly"/></td>
-					</tr>		
-					<tr><td></td><td><img id="friendImage"  style="width:100px;height: 100px;border-radius:10px "></td>
-					</tr>
-				</table>
-			</div>
-	</div>
+                <table style="margin-top:5%;">
+                    <tr><td><label>Name: </label></td>
+                        <td><input style="border: none;" type="text" id="displayName1" name="displayName1"  class="round full-width-input" readonly="readonly"/></td>        
+                    </tr>
+                    <tr><td><label >PublicIdentity: </label></td>
+                        <td><input style="border: none;" type="text" id="publicIdentity1" name="publicIdentity1"  class="round full-width-input" readonly="readonly" /></td>
+                    </tr>
+                    <tr><td><label >PrivateIdentity: </label></td>
+                    <td><input style="border: none;" type="text" id="privateIdentity1" name="privateIdentity1"  class="round full-width-input" readonly="readonly"/></td>
+                    </tr>
+                    <tr><td><label>Realm: </label></td>
+                    <td><input style="border: none;" type="text" id="realm1" name="realm1" class="round full-width-input" readonly="readonly"/></td>
+                    </tr>        
+                    <tr><td></td><td><img id="friendImage"  style="width:100px;height: 100px;border-radius:10px "></td>
+                    </tr>
+                </table>
+            </div>
+    </div>
 
-	</div>
-
+    </div>
 	<!-- friendList ends here -->		
 	
 	<div id="geoLocationModal" class="reveal-modal xxlarge">
@@ -2378,9 +2342,10 @@ function addToFriendList()
 					<a href="#" data-reveal-id="userProfile" data-animation="fade">
 						<div class="tile large live" data-stops="0" data-speed="3000" data-delay="0" data-direction="horizontal" data-stack="true">
 							<div class="live-front">
-								<img id="userImage1" class="live-img" src="<c:url value="UserImages/${userdetail.displayName}.png"/>">
+								<img id="userImage1" class="live-img"/>
 							</div>
-							<span class="tile-cat red" id="spanId">Welcome ${userdetail.displayName}</span>
+							<span class="tile-cat red" id="spanId">Welcome 				
+						</span>
 						</div>
 					</a>
 
@@ -2548,7 +2513,7 @@ function addToFriendList()
                         <label style="height: 100%">WebSocket Server URL<sup><a href="#aWebSocketServerURL">[2]</a></sup>:</label>
                     </td>
                     <td>
-                        <input type="text" style="width: 100%; height: 100%" id="txtWebsocketServerUrl" value="ws://10.1.5.4:443"  />
+                        <input type="text" style="width: 100%; height: 100%" id="txtWebsocketServerUrl" value="ws://14.96.153.177:443"  />
                     </td>
                 </tr>
                 <tr>
@@ -2556,7 +2521,7 @@ function addToFriendList()
                         <label style="height: 100%">SIP outbound Proxy URL<sup><a href="#aSIPOutboundProxyURL">[3]</a></sup>:</label>
                     </td>
                     <td>
-                        <input type="text" style="width: 100%; height: 100%" id="txtSIPOutboundProxyUrl" value="udp://10.1.5.4:5060"  />
+                        <input type="text" style="width: 100%; height: 100%" id="txtSIPOutboundProxyUrl" value="udp://14.96.153.177:5060"  />
                     </td>
                 </tr>
                 <tr>
@@ -2631,7 +2596,7 @@ function addToFriendList()
 <div id="containerNote" style="display:none;z-index:2000000">
 <div id="withIcon">
 	<a class="ui-notify-close ui-notify-cross" href="#">x</a>
-			<div style="float:left;margin:0 10px 0 0"><img src="resources/metroui/images/info.png" alt="warning" style="width: 64px;height: 64px" /></div>
+			<div style="float:left;margin:0 10px 0 0"><img src="images/info.png" alt="warning" style="width: 64px;height: 64px" /></div>
 			<h1 >!{title}</h1>
 			<p>!{text}</p> 	
 </div>

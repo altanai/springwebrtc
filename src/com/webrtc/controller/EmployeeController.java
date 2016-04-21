@@ -1,13 +1,8 @@
 package com.webrtc.controller;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-
-import java.net.BindException;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -21,7 +16,6 @@ import javax.servlet.http.HttpSession;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -36,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.SimpleFormController;
 
@@ -49,9 +42,6 @@ import com.webrtc.bean.OpenidBean;
 import com.webrtc.bean.UserdetailBean;
 import com.webrtc.bean.GeolocationBean;
 import com.webrtc.bean.PresenceBean;
-import com.webrtc.bean.AdvertiseinterestBean;
-import com.webrtc.bean.AdvertisementinterestBean;
-
 import com.webrtc.model.Calllog;
 import com.webrtc.model.Contact;
 import com.webrtc.model.Employee;
@@ -60,9 +50,6 @@ import com.webrtc.model.Openid;
 import com.webrtc.model.Userdetail;
 import com.webrtc.model.Geolocation;
 import com.webrtc.model.Presence;
-import com.webrtc.model.Advertiseinterest;
-import com.webrtc.model.Advertisementinterest;
-
 import com.webrtc.service.CallLogService;
 import com.webrtc.service.ConferenceDetailService;
 import com.webrtc.service.ContactService;
@@ -74,17 +61,19 @@ import com.webrtc.service.UserdetailService;
 import com.webrtc.service.GeolocationService;
 import com.webrtc.service.PresenceService;
 import com.webrtc.service.gmail;
-import com.webrtc.service.AdvertiseinterestService;
-
 import com.webrtc.validator.LoginValidator;
 import com.webrtc.validator.UserValidator;
 
 import java.security.Principal;
 
-@Controller
 
+
+
+@Controller
+/*@RequestMapping("/addUserdetail.htm")
+*/
 @Scope("session")
-//@SessionAttributes("allinoneBean")
+//@SessionAttributes("userdetailBean")
 public class EmployeeController  {
 
 
@@ -110,8 +99,6 @@ public class EmployeeController  {
 	private CallLogService calllogService;
 	@Autowired
 	private EmailmappingService emailmappingService;
-	@Autowired
-	private AdvertiseinterestService advertiseinterestService ;
 	
 	
 	AllinoneBean allinoneBean= new AllinoneBean();
@@ -123,56 +110,66 @@ public class EmployeeController  {
 	  
 	@RequestMapping(value = "/index", method = RequestMethod.GET)
 	public ModelAndView welcome() {
-		System.out.println(" -----> index ");
 		return new ModelAndView("index");
 	}
 	
 	
-	/*@RequestMapping(value = "/advertisement", method = RequestMethod.GET)
+	@RequestMapping(value = "/advertisement", method = RequestMethod.GET)
 	public ModelAndView advertisement() {
 		return new ModelAndView("advertisement");
-	}*/
+	}
 	
 	@RequestMapping(value = "/login", method = RequestMethod.GET)
-	public ModelAndView login(ModelMap model) {
-		System.out.println(" -----> Login ");
-
+	public ModelAndView login() {
 		return new ModelAndView("login");
 	}
 	
-	@RequestMapping(value = "/fail2login", method = RequestMethod.GET)
-	public ModelAndView faillogin(ModelMap model) {
-		System.out.println(" Failed Login ");
-		model.addAttribute("error", "true");
-		return new ModelAndView("login");
+	/*
+	 * ---------------------------------------------------section for employees-------------------------------------
+	 */
+	
+	@RequestMapping(value = "/save", method = RequestMethod.POST)
+	public ModelAndView saveEmployee(@ModelAttribute("command") EmployeeBean employeeBean, 
+			BindingResult result) {	
+		Employee employee = prepareModel(employeeBean);
+		employeeService.addEmployee(employee);
+		return new ModelAndView("redirect:/add.html");
+	}
+
+	@RequestMapping(value="/employees", method = RequestMethod.GET)
+	public ModelAndView listEmployees() {
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("employees",  prepareListofBean(employeeService.listEmployeess()));
+		return new ModelAndView("employeesList", model);
+	}
+
+	@RequestMapping(value = "/add", method = RequestMethod.GET)
+	public ModelAndView addEmployee(@ModelAttribute("command")  EmployeeBean employeeBean,
+			BindingResult result) {
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("employees",  prepareListofBean(employeeService.listEmployeess()));
+		return new ModelAndView("addEmployee", model);
 	}
 	
-
+	@RequestMapping(value = "/delete", method = RequestMethod.GET)
+	public ModelAndView editEmployee(@ModelAttribute("command")  EmployeeBean employeeBean,
+			BindingResult result) {
+		employeeService.deleteEmployee(prepareModel(employeeBean));
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("employee", null);
+		model.put("employees",  prepareListofBean(employeeService.listEmployeess()));
+		return new ModelAndView("addEmployee", model);
+	}
 	
-	/* show login page*/
-	@RequestMapping(value = "/loaddashboard", method = RequestMethod.GET)
-	public ModelAndView loaddashboard(ModelMap model, Principal principal ) {
-		
-		   System.out.println("-----Loading dashboard for -> "+ principal.getName());
-			allinoneBean.setSipuri(principal.getName());
-	    	allinoneBean.setPrivateIdentity(principal.getName());
-	    	
-			ModelAndView modelAndView = new ModelAndView();
-	        modelAndView.setViewName("redirect:dashboard.html");
-
-	    return modelAndView ;
-
+	@RequestMapping(value = "/edit", method = RequestMethod.GET)
+	public ModelAndView deleteEmployee(@ModelAttribute("command")  EmployeeBean employeeBean,
+			BindingResult result) {
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("employee", prepareEmployeeBean(employeeService.getEmployee(employeeBean.getId())));
+		model.put("employees",  prepareListofBean(employeeService.listEmployeess()));
+		return new ModelAndView("addEmployee", model);
 	}
-
-/* do logout action*/
-
-	@RequestMapping(value = "/dologout", method = {RequestMethod.POST, RequestMethod.GET})
-	public ModelAndView dologout() {
-		System.out.println(" Logging out of controller ");	
-		log.info("logout user from webrtc client ");
-		return new ModelAndView("Last");
-	}
-
+	
 	/*
 	 * ------------------------------------------------section for Openid----------------------------------------------
 	 */
@@ -286,6 +283,164 @@ public class EmployeeController  {
 
 	}
 
+	// redirect to login page  	
+/*	@RequestMapping(value = "/login", method = {RequestMethod.POST, RequestMethod.GET})
+	public ModelAndView addlogin(@ModelAttribute("command")  UserdetailBean userdetailBean,
+			BindingResult result) {
+		
+	Map<String, Object> model = new HashMap<String, Object>();	
+	if( userdetailBean.getPrivateIdentity()==null ){
+	model.put("userdetails",  prepareListofBeanUserdetail(userdetailService.listUserdetailss()));
+	}
+	else{
+	model.put("userdetail", prepareBeanUserdetail(userdetailService.getUserdetail(userdetailBean.getPrivateIdentity())));
+	model.put("userdetails",  prepareListofBeanUserdetail(userdetailService.listUserdetailss()));
+	}
+	return new ModelAndView("login", model);
+	}*/
+	
+	//perform login action
+	@RequestMapping(value = "/dologin", method = {RequestMethod.POST, RequestMethod.GET})
+	public ModelAndView dologin(@ModelAttribute("command")  UserdetailBean userdetailBean,
+			BindingResult result) {
+		
+		Map<String, Object> model = new HashMap<String, Object>();
+		List<Userdetail> bean= userdetailService.loginUserdetail(userdetailBean.getPrivateIdentity(), userdetailBean.getPassword());
+		
+		if(bean != null)
+		{
+			//check with presnece for session( presence and loggein ) information
+			log.info("checking presence status and loggein before signin ");
+			Presence presencebean_login =  presenceService.getPresence(userdetailBean.getPrivateIdentity());
+			
+			if(presencebean_login!=null){
+				String p_status=presencebean_login.getPresencestatus();
+				String p_loggedin=presencebean_login.getPresenceloggedin();
+				
+				System.out.println(" Presenec status  "+ p_status + " "+ p_loggedin );
+				
+				if(p_status.equalsIgnoreCase("online") && p_loggedin.equalsIgnoreCase("yes")){
+					log.info("login bean error- session already active in another tab ");
+					return new ModelAndView("redirect:confirmlogin.html");
+				}
+				else if(p_status.equalsIgnoreCase("online") && p_loggedin.equalsIgnoreCase("no")){
+					log.info("login bean error- presnece online ");
+					return new ModelAndView("redirect:confirmlogin.html");
+				}
+				else if(p_status.equalsIgnoreCase("offline") && p_loggedin.equalsIgnoreCase("yes")){
+					log.info("login bean error- presnec not working  ");
+					return new ModelAndView("redirect:confirmlogin.html");
+				}
+				else{
+					log.info("presnece offline and loggedin = no ; login bean =  ok ");
+					model.put("login", prepareListofBeanUserdetail(userdetailService.loginUserdetail(userdetailBean.getPrivateIdentity(), userdetailBean.getPassword())));
+					return new ModelAndView("redirect:confirmlogin.html");
+				}
+			}
+			
+			else{
+				log.info("presence information doesnt exists");
+				System.out.println(" Presence information doesnt exists ");
+				model.put("login", prepareListofBeanUserdetail(userdetailService.loginUserdetail(userdetailBean.getPrivateIdentity(), userdetailBean.getPassword())));
+				
+				ModelAndView modelAndView = new ModelAndView();
+				        modelAndView.setViewName("dashboard.html");
+				//		modelAndView.addObject("where", "maindashboard");
+				//		modelAndView.addObject("sipuri", userdetailBean.getPrivateIdentity());
+				//		modelAndView.addObject("PrivateIdentity", userdetailBean.getPrivateIdentity());
+
+						return modelAndView;
+
+			//	return new ModelAndView("redirect:dashboard.html?sipuri="+userdetailBean.getPrivateIdentity()+"&PrivateIdentity="+userdetailBean.getPrivateIdentity(),model);
+			//	dashboard_allinone("sipuri="+userdetailBean.getPrivateIdentity()+"&PrivateIdentity="+userdetailBean.getPrivateIdentity(),model);
+			//	return new ModelAndView("redirect:dashboard.html??sipuri="+userdetailBean.getPrivateIdentity()+"&PrivateIdentity="+userdetailBean.getPrivateIdentity(),model);
+			}
+	
+		}
+		
+		else{			
+			log.info("login bean error- invalid user credentails ");
+			return new ModelAndView("redirect:login.html", model);
+		}
+	}
+	
+	/*for validation of login*/
+	@RequestMapping(value = "/loginError", method = RequestMethod.GET)
+	public ModelAndView loginError(@ModelAttribute("command")  UserdetailBean userdetailBean,
+			BindingResult result,Model model) {
+		
+	Map<String, Object> modelMap = new HashMap<String, Object>();
+	Map<String, String> modelError = new HashMap<String, String>();
+	
+	if( userdetailBean.getPrivateIdentity()==null ){
+		modelMap.put("userdetails",  prepareListofBeanUserdetail(userdetailService.listUserdetailss()));
+		modelError.put("errorMsg","Login id and Password do not match.");
+	}
+	else{
+		modelMap.put("userdetail", prepareBeanUserdetail(userdetailService.getUserdetail(userdetailBean.getPrivateIdentity())));
+		modelMap.put("userdetails",  prepareListofBeanUserdetail(userdetailService.listUserdetailss()));
+		modelError.put("errorMsg","Login id and Password do not match.");
+	}
+	model.addAttribute("Details", modelMap);
+	model.addAttribute("errorDetails", modelError);
+	return new ModelAndView("login", "loginDetails", model);
+
+	
+	}
+	
+	/* show login page*/
+	@RequestMapping(value = "/dologinvalidate", method = RequestMethod.GET)
+	public ModelAndView loginvalidate(@ModelAttribute("command")  UserdetailBean userdetailBean,
+			BindingResult result , HttpServletRequest request) {
+		
+		LoginValidator validator =new LoginValidator();
+		validator.validateLogin(userdetailBean, result);
+		Map<String, Object> model = new HashMap<String, Object>();
+		
+		if(result.hasErrors()){
+			System.out.println("*********Login and password input error**************************");		
+			return new ModelAndView("login","command",userdetailBean);
+		}
+		List<Userdetail> bean= userdetailService.loginUserdetail(userdetailBean.getPrivateIdentity(), userdetailBean.getPassword());
+	    
+		if(bean != null)
+		{
+	    	System.out.println("********Login and password match ***********");
+	    	//return new ModelAndView("redirect:dashboard.html?sipuri="+userdetailBean.getPrivateIdentity()+"&PrivateIdentity="+userdetailBean.getPrivateIdentity(),model);
+	    	//return new ModelAndView("redirect:dashboard.html",model);
+	
+	    	allinoneBean.setSipuri(userdetailBean.getPrivateIdentity());
+	    	allinoneBean.setPrivateIdentity(userdetailBean.getPrivateIdentity());
+	    	
+			ModelAndView modelAndView = new ModelAndView();
+	        modelAndView.setViewName("redirect:dashboard.html");
+	        
+	        
+		//	modelAndView.addObject("where", "maindashboard");
+		//	modelAndView.addObject("sipuri", userdetailBean.getPrivateIdentity());
+		//	modelAndView.addObject("PrivateIdentity", userdetailBean.getPrivateIdentity());
+		//  request.getSession().setAttribute("PrivateIdentity", userdetailBean.getPrivateIdentity()); 
+
+	    return modelAndView ;
+		}
+		else
+		{
+			System.out.println("**********login id and password do not match********");
+			return new ModelAndView("redirect:loginError.html");
+			
+		}
+
+
+	}
+
+/* do logout action*/
+
+	@RequestMapping(value = "/dologout", method = {RequestMethod.POST, RequestMethod.GET})
+	public ModelAndView dologout() {
+		System.out.println(" Logging out of controller ");	
+		log.info("logout user from webrtc client ");
+		return new ModelAndView("Last");
+	}
 	
 	
 	/*
@@ -379,7 +534,7 @@ public class EmployeeController  {
 		contactService.deleteContact(prepareModelContact(contactBean));
 		Map<String, Object> model = new HashMap<String, Object>();
 		model.put("contact", null);
-		model.put("contacts",  prepareListofBeanContact(contactService.listContactss(allinoneBean.getSipuri())));
+		model.put("contacts",  prepareListofBeanContact(contactService.listContactss()));
 		return new ModelAndView("addContact", model);
 	}
 
@@ -388,10 +543,9 @@ public class EmployeeController  {
 			BindingResult result) {
 		Map<String, Object> model = new HashMap<String, Object>();
 		model.put("contact", prepareBeanContact(contactService.getContact(contactBean.getSipuri())));
-		model.put("contacts",  prepareListofBeanContact(contactService.listContactss(allinoneBean.getSipuri())));
+		model.put("contacts",  prepareListofBeanContact(contactService.listContactss()));
 		return new ModelAndView("addContact", model);
 	}
-	
 	
 @RequestMapping(value = "/savecontact", method = RequestMethod.POST)
 public ModelAndView saveContact(@ModelAttribute("command") ContactBean contactBean, 
@@ -404,8 +558,7 @@ public ModelAndView saveContact(@ModelAttribute("command") ContactBean contactBe
 @RequestMapping(value="/contact", method = RequestMethod.GET)
 public ModelAndView listContact() {
 	Map<String, Object> model = new HashMap<String, Object>();
-	model.put("contact",  prepareListofBeanContact(contactService.listContactss(allinoneBean.getSipuri())));
-	
+	model.put("contact",  prepareListofBeanContact(contactService.listContactss()));
 	return new ModelAndView("ContactsList", model);
 }
 
@@ -415,81 +568,17 @@ public ModelAndView addContact(@ModelAttribute("command")  ContactBean contactBe
 	Map<String, Object> model = new HashMap<String, Object>();
 	
 	if( contactBean.getSipuri()==null ){
-	model.put("contacts",  prepareListofBeanContact(contactService.listContactss(allinoneBean.getSipuri())));
+		System.out.println("Contact bean : sipuri is null  no records found ");
+	model.put("contacts",  prepareListofBeanContact(contactService.listContactss()));
 	}
 	else{
-/*	model.put("contact",  prepareBeanContact(contactService.getContact(contactBean.getSipuri())));*/
-	model.put("contacts",  prepareListofBeanContact(contactService.listContactss(allinoneBean.getSipuri())));
+	model.put("contact",  prepareBeanContact(contactService.getContact(contactBean.getSipuri())));
+	model.put("contacts",  prepareListofBeanContact(contactService.listContactss()));
 	}
 	
 	return new ModelAndView("addContact", model);	
 }
-
-/*------------------------------------------Advertisements---------------------------------------*/
-
-@RequestMapping(value = "/saveadvertisement", method = RequestMethod.POST)
-public ModelAndView saveAdvertisement(@ModelAttribute("command") AdvertisementinterestBean advertisementinterestBean, 
-		BindingResult result){
-	Advertisementinterest advertisementinterest = prepareModelAdvertisementinterest(advertisementinterestBean);
-	advertiseinterestService.addAdvertisementinterest(advertisementinterest);
-
-	return new ModelAndView("redirect:/addAdvertisement.html");
-}
-
-
-@RequestMapping(value = "/addAdvertisement", method = RequestMethod.GET)
-public ModelAndView addAdvertiseinterest(@ModelAttribute("command")  AdvertisementinterestBean advertisementinterestBean,
-		BindingResult result) {
-	Map<String, Object> model = new HashMap<String, Object>();
 	
-	if( advertisementinterestBean.getSub1()==null ){
-	model.put("advertiseinterests",  prepareListofBeanAdvertiseinterest(advertiseinterestService.listAdvertiseinterestss()));
-	}
-	else{
-/*	model.put("contact",  prepareBeanContact(contactService.getContact(contactBean.getSipuri())));*/
-	model.put("advertiseinterests",  prepareListofBeanAdvertiseinterest(advertiseinterestService.listAdvertiseinterestss()));
-	}
-	
-	return new ModelAndView("AddAdvertisement", model);	
-}
-
-@RequestMapping(value = "/uploadimage", method = RequestMethod.POST)
-public String create(@ModelAttribute("command")AdvertisementinterestBean advertisementinterestBean, HttpServletRequest request,
-		HttpServletResponse response, Object command, BindException errors,
-		HttpSession session) {
-	try {
-
-		MultipartFile filea = advertisementinterestBean.getFileData();
-
-		InputStream inputStream = null;
-		OutputStream outputStream = null;
-		if (filea.getSize() > 0) {
-			inputStream = filea.getInputStream();
-			
-			outputStream = new FileOutputStream("C:\\Rupali2\\Spring3WebRTC\\WebRoot\\AdvertiseImages\\"
-					+ filea.getOriginalFilename());
-			
-			System.out.println(filea.getOriginalFilename());
-		
-			int readBytes = 0;
-			byte[] buffer = new byte[8192];
-			while ((readBytes = inputStream.read(buffer, 0, 8192)) != -1) {
-				
-				outputStream.write(buffer, 0, readBytes);
-			}
-			outputStream.close();
-			inputStream.close();
-			session.setAttribute("success", "File Uploaded Successfully");
-			session.setAttribute("uploadFile", "/home/altanai/git/webrtcspring/Spring3WebRTCsecure/WebRoot/AdvertiseImages"
-					+ filea.getOriginalFilename());
-		}
-	} catch (Exception e) {
-		e.printStackTrace();
-	}
-	return "redirect:/addAdvertisement.html";
-}
-
-
 
 /*------------------------------------------Conferencing---------------------------------------*/	
 @RequestMapping(value = "/conferencing", method = RequestMethod.GET)
@@ -498,11 +587,11 @@ public ModelAndView conference(@ModelAttribute("command")  ContactBean contactBe
 Map<String, Object> model = new HashMap<String, Object>();
 	
 	if( contactBean.getSipuri()==null ){
-	model.put("contacts",  prepareListofBeanContact(contactService.listContactss(allinoneBean.getSipuri())));
+	model.put("contacts",  prepareListofBeanContact(contactService.listContactss()));
 	}
 	else{
 	model.put("contact",  prepareBeanContact(contactService.getContact(contactBean.getSipuri())));
-	model.put("contacts",  prepareListofBeanContact(contactService.listContactss(allinoneBean.getSipuri())));
+	model.put("contacts",  prepareListofBeanContact(contactService.listContactss()));
 	}
 	
 	return new ModelAndView("conferencing", model);	
@@ -582,7 +671,7 @@ return new ModelAndView("redirect:/addpresence.html?sipuri="+presenceBean.getSip
 @RequestMapping(value="/presence", method = RequestMethod.GET)
 public ModelAndView listPresence() {
 Map<String, Object> model = new HashMap<String, Object>();
-model.put("contact",  prepareListofBeanContact(contactService.listContactss(allinoneBean.getSipuri())));
+model.put("contact",  prepareListofBeanContact(contactService.listContactss()));
 return new ModelAndView("PresencesList", model);
 }
 
@@ -604,12 +693,15 @@ return new ModelAndView("addPresence", model);
 }
 
 /* ----------------------------------------------Notification -----------------------*/
-
+@RequestMapping(value="Notifier.html",method=RequestMethod.GET)
+public String showNotification()
+{
+	return "Notifier";
+}
 @RequestMapping(value="getFreshNotifications.html", method=RequestMethod.POST)
-public @ResponseBody String getNotifications(@RequestParam("userId") String userId) throws JSONException{
+public @ResponseBody String getNotifications(@RequestParam("userId") String userId){
 
 	List<Notification> notificationList =notificationSerivce.getAllNotifications(userId);
-	if(notificationList!=null){
 	JSONObject jsonResponse=new JSONObject();
 	try {
 		jsonResponse.put("Result", "OK");
@@ -623,7 +715,7 @@ public @ResponseBody String getNotifications(@RequestParam("userId") String user
 			if(notify.getNotificationType().equalsIgnoreCase("VoiceMail")){
 				notificationDetail=" left a new Voice-Mail for you at "+notify.getNotificationTON();
 			}
-			else if(notify.getNotificationType().equalsIgnoreCase("CONFERENCE")){
+			else if(notify.getNotificationType().equalsIgnoreCase("Conference")){
 				notificationDetail=" has invited you to join a Conference at "+notify.getNotificationTON();
 			}
 			jsonNotification.put("DETAILS",notify.getNotificationSender()+notificationDetail);
@@ -636,12 +728,6 @@ public @ResponseBody String getNotifications(@RequestParam("userId") String user
 		e.printStackTrace();
 	}
 	return jsonResponse.toString();
-	}
-	else {
-		JSONObject jsonResponse=new JSONObject();
-		jsonResponse.put("error","Some Error Occurred");
-		return jsonResponse.toString();
-	}
 }
 
 
@@ -671,27 +757,6 @@ public ModelAndView addCalllog(@ModelAttribute("command")  CalllogBean calllogBe
 
 	return new ModelAndView("addCallLog", model);
 }
-/*
-* -----------------------------Show friend detail---------------------
-* 
-*/
-@RequestMapping(value = "/showuserdetail", method = RequestMethod.POST)
-public @ResponseBody String showDetail(@RequestParam("friend") String friend) throws JSONException
-{
-System.out.println(friend+" friendnmae");
-Userdetail userdetails=new Userdetail();
-userdetails = userdetailService.getUserdetail(friend);
-JSONObject jsonResponse=new JSONObject();
-jsonResponse.put("Result", "OK");
-JSONObject jsonFriend=new JSONObject();
-jsonFriend.put("displayName", userdetails.getUserdetaildisplayName());
-jsonFriend.put("publicIdentity", userdetails.getUserdetailpublicIdentity());
-jsonFriend.put("privateIdentity", userdetails.getUserdetailprivateIdentity());
-jsonFriend.put("realm", userdetails.getUserdetailrealm());
-jsonResponse.put("JsonFriend", jsonFriend);
-System.out.println("Successfully completed");
-return jsonResponse.toString();
-}
 
 
 /*------------------------------------------------Dashboard----------------------------------*/
@@ -709,15 +774,9 @@ return jsonResponse.toString();
 		if(userdetailTemp!=null){
 			model.put("userdetail", prepareBeanUserdetail(userdetailTemp));
 			System.out.println("Userdetails  "+userdetailTemp.getUserdetaildisplayName()+userdetailTemp.getUserdetailprivateIdentity()+userdetailTemp.getUserdetailpublicIdentity()+userdetailTemp.getUserdetailrealm()+ userdetailTemp.getUserdetailpassword());
-	
-			/*
-			 * Add details to session bean too : allinoneBean
-			 */
-			allinoneBean.setDisplayName(userdetailTemp.getUserdetaildisplayName());
-			allinoneBean.setRealm(userdetailTemp.getUserdetailrealm());
 		}
 		model.put("userdetails",  prepareListofBeanUserdetail(userdetailService.listUserdetailss()));
-		
+
 		//openid
 		Openid openidTemp= openidService.getOpenid(allinoneBean.getSipuri());
 		if(openidTemp!=null){
@@ -734,22 +793,13 @@ return jsonResponse.toString();
 		}		
 		model.put("geolocations",  prepareListofBeanGeolocation(geolocationService.listGeolocations()));
 		
-       /* //contact		
+        //contact		
 		Contact contactTemp= contactService.getContact(allinoneBean.getSipuri());
 		if(contactTemp!=null){
 			model.put("contact", prepareBeanContact(contactTemp));
 			System.out.println(" Contact "+contactTemp.getContactfriend());
-		}
-		*/		
-		List<Contact> tempcontactBeanlist = contactService.listContactss(allinoneBean.getSipuri());
-		model.put("contacts",  prepareListofBeanContact(tempcontactBeanlist));	
-		model.put("userdetailsnotfriend", prepareListofBeanUserdetail(userdetailService.listUserdetailNotFriend(userdetailTemp)));
-
-	/*	 
-		for(int i=0;i<=tempcontactBeanlist.size();i++){
-			List<Presence> temppresenceBeanlist = presenceService.listspecificPresencess(tempcontactBeanlist.get(i).getContactsipuri());	
-		}
-		model.put("contacts",  prepareListofBeanContact(tempcontactBeanlist));*/
+		}		
+		model.put("contacts",  prepareListofBeanContact(contactService.listContactss()));	
 		
 		return new ModelAndView("Dashboard",model);
 	}
@@ -782,63 +832,13 @@ return jsonResponse.toString();
 	public @ResponseBody String addContactAjax(@ModelAttribute(value="contactBean") ContactBean contactBean, BindingResult result ){
 			
 			String returnText;
-			Map<String, Object> model = new HashMap<String, Object>();
-			log.info(" Conatct ajax request "+ contactBean.getSipuri()+ " "+ contactBean.getFriend());
-			
+			System.out.println(" Conatct ajax request "+ contactBean.getSipuri()+ " "+ contactBean.getFriend());
 			if(!result.hasErrors()){
 
 				Contact contact = prepareModelContact(contactBean);
 				contactService.addContact(contact);
 				
-				Userdetail userdetailTemp= userdetailService.getUserdetail(allinoneBean.getSipuri());
-				
-				
-				 JSONObject jsonResponseFrd=new JSONObject();
-				 ArrayList<JSONObject> frd=new ArrayList<JSONObject>();
-				 ArrayList<JSONObject> notFrd=new ArrayList<JSONObject>();
-				 
-				List<ContactBean> tempcontactBeanlist= prepareListofBeanContact(contactService.listContactss(allinoneBean.getSipuri()));
-				List<UserdetailBean> tempuserDetailBeanlist =  prepareListofBeanUserdetail(userdetailService.listUserdetailNotFriend(userdetailTemp));
-
-				try{
-					  jsonResponseFrd.put("Result","OK");
-					  for(int i=0;i<tempcontactBeanlist.size();i++)
-					  {
-						  JSONObject obj=new JSONObject();
-						  obj.put("Friendsipuri", tempcontactBeanlist.get(i).getFriend());
-				 	  
-						  //get presence of frined with the sipuri from tempcontact bean list get i get suipuri
-						  Presence presencefriend= presenceService.getPresence(tempcontactBeanlist.get(i).getFriend());
-  
-						  if(presencefriend !=null){
-							  String presenecfriendstatus = presencefriend.getPresencestatus();
-						      obj.put("Presence", presenecfriendstatus);
-						  }
-						  else
-							  obj.put("Presence", "offline");  
-						  
-						  frd.add(obj);
-					  }
-					  for(int i=0;i<tempuserDetailBeanlist.size();i++)
-					  {
-						 // System.out.println(tempuserDetailBeanlist.get(i).getPrivateIdentity());
-						  JSONObject obj=new JSONObject();
-						  obj.put("NotFriendsipuri",tempuserDetailBeanlist.get(i).getPrivateIdentity());
-						  notFrd.add(obj);
-					  }
-					  jsonResponseFrd.accumulate("Friends", frd);
-					  jsonResponseFrd.accumulate("NotFriends", notFrd);
-					 
-				  }
-				  catch(JSONException e){
-					  e.printStackTrace();
-				  }
-				
-				return jsonResponseFrd.toString();
-				
-				//returnText = "User has been added to the list, for "+ contactBean.getSipuri()+ " ! ";
-				
-				
+				returnText = "User has been added to the list, for "+ contactBean.getSipuri()+ " ! ";
 			}else{
 				returnText = "Sorry, an error has occur. User has not been added to list.";
 			}
@@ -847,48 +847,33 @@ return jsonResponse.toString();
 
 		/*---------------------------------Ajax content for Profile-Pic----------------------------*/
 		@RequestMapping(value="/updateProfilePic",method=RequestMethod.POST)
-		public  String updateProfilePic(@ModelAttribute("command")UserdetailBean userdetailBean, HttpServletRequest request,
-		        HttpServletResponse response, Object command, BindException errors,
-		        HttpSession session) {
-		    try {
-
-		String user=allinoneBean.getPrivateIdentity();
-		user=user.replace("sip:", "");
-		user=user.replace("@tcs.com", "");
+	public @ResponseBody String addContactAjax(HttpServletRequest request,HttpServletResponse response ) throws IOException{
+		System.out.println("function called");
+			InputStream input=request.getInputStream();
+		ArrayList<Byte> listOfBytes=new ArrayList<Byte>();
+		int i=0;
+		do{
+			i=input.read();
+			if(i!=-1)
+			{
+				listOfBytes.add((byte) i);
+			}
+		}while(i!=-1);
+		System.out.println(listOfBytes.size());
 		
-		System.out.println("update profile picture for user user : "+user);
-
-		        MultipartFile filea = userdetailBean.getFileData();    
-
-		        System.out.println(" filea profile picture returned by user "+ filea);
-		        
-		        InputStream inputStream = null;
-		        OutputStream outputStream = null;
-		        
-		        if (filea.getSize() > 0) {
-		            inputStream = filea.getInputStream();
-		            String pathOfFile=request.getServletContext().getRealPath("UserImage");
-		            System.out.println(" File stored at -> "+pathOfFile);
-		            pathOfFile=pathOfFile+"/"+ user+".png";
-		            outputStream=new FileOutputStream(pathOfFile);
-		            
-		            int readBytes = 0;
-		            byte[] buffer = new byte[500000];
-		            while ((readBytes = inputStream.read(buffer, 0, 500000)) != -1) {
-		                
-		                outputStream.write(buffer, 0, readBytes);
-		            }            
-		            
-		            outputStream.close();
-		            inputStream.close();
-		            session.setAttribute("success", "File Uploaded Successfully");
-		            session.setAttribute("uploadFile", pathOfFile);
-		        }
-		        
-		    } catch (Exception e) {
-		        e.printStackTrace();
-		    }
-		    return "redirect:/dashboard.html?sipuri="+allinoneBean.getPrivateIdentity()+"&PrivateIdentity="+allinoneBean.getPrivateIdentity();
+		byte[] picBytes=new byte[listOfBytes.size()];
+		for (int j = 0; j < listOfBytes.size(); j++) {
+			picBytes[j]=listOfBytes.get(j);
+		}
+		input.close();
+		String pathOfFile=request.getServletContext().getRealPath("User-Images");
+		System.out.println(" File stored at -> "+pathOfFile);
+		pathOfFile=pathOfFile+"/userImage.png";
+		FileOutputStream fout=new FileOutputStream(pathOfFile);
+		fout.write(picBytes);
+		fout.flush();
+		fout.close();
+		return "Profile-Pic updated Successfully";
 		}
 
 	
@@ -914,14 +899,14 @@ return jsonResponse.toString();
 
 
     /*-------------------------------Ajax content for Presence---------------------------*/			
-	@RequestMapping(value="/addpresenceajax",method = {RequestMethod.POST, RequestMethod.GET})
+			@RequestMapping(value="/addpresenceajax",method=RequestMethod.POST)
 	public @ResponseBody String addPresenceAjax(@ModelAttribute(value="presenceBean") PresenceBean presenceBean, BindingResult result ){
 
 		        log.info("Presence ajax request "+ presenceBean.getSipuri()+ 
 		        		presenceBean.getStatus()+ presenceBean.getLoggedin());
 		       
-		       /* System.out.println("Presence ajax request "+ presenceBean.getSipuri()+ 
-		        		presenceBean.getStatus()+ presenceBean.getLoggedin());*/
+		        System.out.println("Presence ajax request "+ presenceBean.getSipuri()+ 
+		        		presenceBean.getStatus()+ presenceBean.getLoggedin());
 
 		        if(!result.hasErrors()){		        	
 		    		Presence presence = prepareModelPresence(presenceBean);	
@@ -929,24 +914,16 @@ return jsonResponse.toString();
 				}
 				return "done";
 			}
-	@RequestMapping(value="/fetchpresenceajax",method = {RequestMethod.POST, RequestMethod.GET})
-	public @ResponseBody String readPresenceAjax(@ModelAttribute(value="presenceBean") PresenceBean presenceBean, BindingResult result ){
-		        Presence presence=null;;
-		        if(!result.hasErrors()){		        	
-		    		presence = presenceService.getPresence(presenceBean.getSipuri());		    		
-				}
-				return presence.getPresencestatus();
-			}
-
+	
     /*-------------------------------Ajax content for Callogs--------------------------*/			
-	@RequestMapping(value="/addcalllogajax",method = {RequestMethod.POST, RequestMethod.GET})
+	@RequestMapping(value="/addcalllogajax",method=RequestMethod.POST)
 	public @ResponseBody String addCalllogAjax(@ModelAttribute(value="calllogBean") CalllogBean calllogBean, BindingResult result ){
 
         log.info("Calllog ajax request "+ calllogBean.getCaller()+ calllogBean.getCallee()
         		+calllogBean.getDate());
-/*       
+       
         System.out.println("Calllog ajax request "+ calllogBean.getCaller()+ calllogBean.getCallee()
-        		+calllogBean.getDate());*/
+        		+calllogBean.getDate());
 
 		    		Calllog calllog= prepareModelCalllog(calllogBean);	
 		    		calllogService.addCall(calllog);		    		
@@ -963,7 +940,7 @@ return jsonResponse.toString();
 								
 			    				for ( int i=0;i<=listcalllogbeanTemp.size();i++)
 		    					  {
-			    					log.info(" values returning to jsp from controller "
+			    					System.out.println(" values returning to jsp from controller "
 			    						+ listcalllogbeanTemp.get(i).getCaller() 
 			    						+ listcalllogbeanTemp.get(i).getCallee()
 			    						+ listcalllogbeanTemp.get(i).getDate());
@@ -1291,83 +1268,42 @@ return jsonResponse.toString();
 	
 		return bean;
 	}
-	
-	/*--------------Interest object----------------------*/
-	
-	
-	private Advertisementinterest prepareModelAdvertisementinterest(AdvertisementinterestBean advertisementinterestBean){
-		Advertisementinterest advertisementinterest = new Advertisementinterest();
-		
-		
-		advertisementinterest.setAdvertisementinterest(advertisementinterestBean.getInterest());
-		advertisementinterest.setAdvertisementsub1(advertisementinterestBean.getSub1());
-		advertisementinterest.setAdvertisementsub2(advertisementinterestBean.getSub2());
-		advertisementinterest.setAdvertisementsub3(advertisementinterestBean.getSub3());
-		return advertisementinterest;
-	}
-	
-	private List<AdvertisementinterestBean> prepareListofBeanAdvertisementinterest(List<Advertisementinterest> list){
-		List<AdvertisementinterestBean> beans = null;
-		if(list != null && !list.isEmpty()){
-			beans = new ArrayList<AdvertisementinterestBean>();
-			AdvertisementinterestBean bean = null;
-			for(Advertisementinterest advertisementinterest : list){
-				bean = new AdvertisementinterestBean();
-			
-				bean.setInterest(advertisementinterest.getAdvertisementinterest());
-				bean.setSub1(advertisementinterest.getAdvertisementsub1());
-				bean.setSub2(advertisementinterest.getAdvertisementsub2());
-				bean.setSub3(advertisementinterest.getAdvertisementsub3());
-				
-				beans.add(bean);
-			}
-		}
-		return beans;
-	}
-	
-	private List<AdvertiseinterestBean> prepareListofBeanAdvertiseinterest(List<Advertiseinterest> list){
-		List<AdvertiseinterestBean> beans = null;
-		if(list != null && !list.isEmpty()){
-			beans = new ArrayList<AdvertiseinterestBean>();
-			AdvertiseinterestBean bean = null;
-			for(Advertiseinterest advertiseinterest : list){
-				bean = new AdvertiseinterestBean();
-			
-				bean.setAccessories(advertiseinterest.getAdvertiseaccessories());
-				bean.setAutomobile(advertiseinterest.getAdvertiseautomobile());
-				bean.setFood(advertiseinterest.getAdvertisefood());
-		
-				
-				beans.add(bean);
-			}
-		}
-		return beans;
-	}
-	
-	private AdvertisementinterestBean prepareBeanAdvertisementinterest(Advertisementinterest advertisementinterest){
-		AdvertisementinterestBean bean = new AdvertisementinterestBean();
 
-		bean.setSequenceNumber(advertisementinterest.getAdvertisementSequenceNumber());
-		bean.setInterest(advertisementinterest.getAdvertisementinterest());
-		bean.setSub1(advertisementinterest.getAdvertisementsub1());
-		bean.setSub2(advertisementinterest.getAdvertisementsub2());
-		bean.setSub3(advertisementinterest.getAdvertisementsub3());
-		
-		return bean;
-	}
+	/*
+	 * security setetings for springs ecurity	
+	 */
 	
-	private AdvertiseinterestBean prepareBeanAdvertiseinterest(Advertiseinterest advertiseinterest){
-		AdvertiseinterestBean bean = new AdvertiseinterestBean();
-
-		
-		bean.setAccessories(advertiseinterest.getAdvertiseaccessories());
-		bean.setAutomobile(advertiseinterest.getAdvertiseautomobile());
-		bean.setFood(advertiseinterest.getAdvertisefood());
-		
-		
-		return bean;
+	@RequestMapping(value="/secureindex", method = RequestMethod.GET)
+	public String executeSecurity(ModelMap model, Principal principal ) {
+ 
+		System.out.println(" secure index");
+		String name = principal.getName();
+		model.addAttribute("author", name);
+		model.addAttribute("message", "Welcome To Login Form Based Spring Security Example!!!");
+		return "welcome";
+ 
 	}
-	
-
+ 
+	@RequestMapping(value="/securelogin", method = RequestMethod.GET)
+	public String login(ModelMap model) {
+     System.out.println(" secure login");
+		return "securelogin";
+ 
+	}
+ 
+	@RequestMapping(value="/securefail2login", method = RequestMethod.GET)
+	public String loginerror(ModelMap model) {
+		System.out.println(" fail2login ");
+		model.addAttribute("error", "true");
+		return "securelogin";
+ 
+	}
+ 
+	@RequestMapping(value="/securelogout", method = RequestMethod.GET)
+	public String logout(ModelMap model) {
+ 
+		return "securelogin";
+ 
+	}
 	
 }

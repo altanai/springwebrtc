@@ -60,7 +60,7 @@
 				<td><c:out value="${employee.address}"/></td>
 				<td align="center"><a href="edit.html?id=${employee.id}">Edit</a> | <a href="delete.html?id=${employee.id}">Delete</a></td>
 			</tr>
-		</c:forEach> 
+		</c:forEach>
 	</table>
 </c:if>
 	</body>
