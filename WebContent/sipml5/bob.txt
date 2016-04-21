@@ -1,4 +1,0 @@
-sip:hunt@tcs.com
-sip:stun@tcs.com
-sip:alice@tcs.com
-sip:bob@tcs.com

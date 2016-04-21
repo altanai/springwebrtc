@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="WebRTC_presentation">
+        <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/DAO"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/BEAN"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/presence"/>
+        <property name="context-root" value="WebRTC_presentation"/>
+        <property name="java-output-path" value="/WebRTC_presentation/build/classes"/>
+    </wb-module>
+</project-modules>
