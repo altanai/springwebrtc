@@ -1,0 +1,14 @@
+drop table presence 
+
+create table presence (sipuri varchar(45),status varchar(10) default 'offline')
+
+
+
+DELIMITER $$
+create trigger addpresence after insert on registrationtable
+for each row begin 
+	insert into presence 
+	set sipuri=new.privateidentity,
+	status='offline';
+end$$
+DELIMITER ; 
