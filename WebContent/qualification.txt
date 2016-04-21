@@ -1,0 +1,6 @@
+Select
+BTech
+BE
+Diploma
+MTech
+MBA
