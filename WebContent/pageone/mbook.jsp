@@ -10,25 +10,25 @@
             <form method="post" action="../message" id="contactform">
 
 
-                    <div>
-                    <label> To      :</label>
+                    
+                    <label> SIP uri :</label>
                     <input name="name" type="text" id="name" value="" />
-                    </div>
-
-                    <div>
-                    <label>Subject  :</label>
+                    
+						<br>
+                  
+                    <label>Subject:</label>
                     <input name="subject" type="text" id="subject"  value="" />
-                    </div>
-
-                    <div>
-                    <label>Message  :<span class="required">*</span></label>
+                    
+						<br>
+                   
+                    <label>Message :</label>
                     <textarea name="message" rows="20" cols="50"  id="message" ></textarea><br /><br />
-                    </div>
-
-                    <div>
+                    
+						<br>
+                    
 					<input type="submit"  value="Submit" class="button">
          			<input type="reset" value="Reset" class="button">
-					</div>
+					
 
 
            </form>
@@ -41,10 +41,10 @@
                         <li class="facebook"><a href="#">Facebook</a></li>
                         <li class="googleplus"><a href="#">Google+</a></li>
                         <li class="twitter"><a href="#">Twitter</a></li>
-                        <li class="dribble"><a href="#">Dribble</a></li>
-                        <li class="linkedin"><a href="#">Linkedin</a></li>
-                        <li class="delicious"><a href="#">Delicious</a></li>
-                        <li class="flickr"><a href="#">Flickr</a></li>
+<!--                         <li class="dribble"><a href="#">Dribble</a></li> -->
+<!--                         <li class="linkedin"><a href="#">Linkedin</a></li> -->
+<!--                         <li class="delicious"><a href="#">Delicious</a></li> -->
+<!--                         <li class="flickr"><a href="#">Flickr</a></li> -->
                     </ul>
 
             </aside>

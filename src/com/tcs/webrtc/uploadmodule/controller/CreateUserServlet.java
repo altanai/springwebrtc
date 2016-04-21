@@ -101,7 +101,7 @@ public class CreateUserServlet extends HttpServlet {
 			UserProfile person=new CreateUserDao().getUser(request.getParameter("id"));
 			if(person==null)
 			{
-				System.out.println("No Record Found");
+				System.out.println("No Record Found in crea user servlet 1 - Get method for " + person.getName());
 				return;
 			}
 			response.setContentType("image/jpeg");

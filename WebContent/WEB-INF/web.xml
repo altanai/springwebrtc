@@ -113,4 +113,16 @@
     <servlet-name>PresenceServlet</servlet-name>
     <url-pattern>/PresenceServlet</url-pattern>
   </servlet-mapping>
+  
+      <servlet>
+    <display-name>CreateUserServlet1</display-name>
+    <servlet-name>CreateUserServlet1</servlet-name>
+    <servlet-class>phonebook.webrtc.CreateUserServlet1</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>CreateUserServlet1</servlet-name>
+    <url-pattern>/CreateUserServlet1</url-pattern>
+  </servlet-mapping>
+  
+  
 </web-app>

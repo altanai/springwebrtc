@@ -53,6 +53,13 @@ public class phonebookLineServlet extends HttpServlet {
 			throws ServletException, IOException {
 		PrintWriter out = response.getWriter();
 
+		//--------------------------------presentation server
+	presentation_server pss=new presentation_server();
+	String rdarr[]=new String[1];
+	rdarr=pss.read_presentation_server_file();
+	String serverip=rdarr[0];
+	//--------------------------pr4esentation server
+		
 		registrationDao rdao=new registrationDao();
 		ArrayList<registration> registeredusers =rdao.fetchregisteredvalues();
 		System.out.println(" fetched registrstion values for phonebook "+ registeredusers.size()+registeredusers.toString());
@@ -74,15 +81,9 @@ public class phonebookLineServlet extends HttpServlet {
 		
 		request.setAttribute("registrationDetails", list);
 		
-		//--------------------------------presentation server
-		presentation_server ps=new presentation_server();
-		String rdarr[]=new String[1];
-		rdarr=ps.read_presentation_server_file();
-		String serverip=rdarr[0];
-		//--------------------------pr4esentation server
-		
     	RequestDispatcher view = request.getRequestDispatcher("/pageone/phonebookline.jsp");
 		//RequestDispatcher view = request.getRequestDispatcher("/sipml5/subscribe.jsp");
+		//RequestDispatcher view = request.getRequestDispatcher("/CreateUserServlet1?action=ViewList");
 		view.forward(request, response);
 
 	}

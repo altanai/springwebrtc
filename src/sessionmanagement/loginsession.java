@@ -50,6 +50,7 @@ public class loginsession extends HttpServlet {
 		System.out.println(" releam :"+ releam);
 		
 		   HttpSession session = request.getSession();
+		   session.setAttribute( "serverip", request.getParameter("serverip") );
 		   session.setAttribute( "name", request.getParameter("name") );
 		   session.setAttribute( "privateIdentity",request.getParameter("privateIdentity") );
 		   session.setAttribute( "releam",request.getParameter("releam"));

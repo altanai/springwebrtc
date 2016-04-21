@@ -5,6 +5,8 @@
 <html>
 <!-- head -->
 <head>
+
+
 	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     <!-- <meta charset="utf-8" /> -->
     <title>sipML5 live demo</title>
@@ -116,6 +118,19 @@
     <link rel="apple-touch-icon-precomposed" sizes="114x114" href="./assets/ico/apple-touch-icon-114-precomposed.png" />
     <link rel="apple-touch-icon-precomposed" sizes="72x72" href="./assets/ico/apple-touch-icon-72-precomposed.png" />
     <link rel="apple-touch-icon-precomposed" href="./assets/ico/apple-touch-icon-57-precomposed.png" />
+
+
+<script>
+//reading current server ip
+var pathOfFileToRead = "presentation_server_config.txt";
+//var pathOfFileToRead = "//home//altanai//strutswkspace//readfilefromjs//WebContent//bob.txt";	
+var contentsOfFileAsString = FileHelper.readStringFromFileAtPath(pathOfFileToRead);
+serverip=contentsOfFileAsString;
+alert(":server ip"+serverip );
+//end reading current server iup 
+
+</script>
+
 </head>
 <!-- Javascript code -->
 <script type="text/javascript">
@@ -124,7 +139,16 @@
     //if (window.location.href.indexOf("svn=") == -1) {
     //    window.location.href += (window.location.href.indexOf("?") == -1 ? "?svn=13" : "&svn=13");
     //}
-
+	var arr;  //Array Variable declared globally
+	var xmlHttpRequest;
+	if(window.XMLHttpRequest)
+	{
+	xmlHttpRequest=new XMLHttpRequest();
+	}
+	else if(window.ActiveXObject)
+	{
+	xmlHttpRequest=new ActiveXObject(MICROSOFT.XMLHTTP);
+	}
     var sTransferNumber;
     var oRingTone, oRingbackTone;
     var oSipStack, oSipSessionRegister, oSipSessionCall, oSipSessionTransferCall;
@@ -521,10 +545,8 @@
 				+ '<contact>sip:bob@tcs.com</contact>\n'
 				+ '<note>online</note></status>\n' + '</tuple>\n'
 				+ '</presence>';
-				
-	/* 	alert("dhin ta ta"); */
 		oSipPublish.publish(content, contentType);
-		alert("dhin ta ta22222");
+	//	alert("dhin ta ta22222");
 
 	}
 	
@@ -570,12 +592,9 @@
 		subscribeSession = oSipStack.newSession("subscribe", oConfigSub);
 
 		// start watching for entity's presence status (You may track event type 'connected' to be sure that the request has been accepted by the server)
-			
-					
-						 		to[i]=friendslist[i];
-								
-							
-								subscribeSession.subscribe(to[i]);
+
+			to[i]=friendslist[i];
+			subscribeSession.subscribe(to[i]);
 						
 	
 			}
@@ -587,6 +606,11 @@
     
     // makes a call (SIP INVITE)
     function sipCall(s_type) {
+		arr=new Array(); 
+		arr[arr.length]="Altanai";
+		arr[arr.length]=document.getElementById("txtPhoneNumber").value;
+		var startTime=new Date();
+		arr[arr.length]=startTime.getTime();
         if (oSipStack && !oSipSessionCall && !tsk_string_is_null_or_empty(txtPhoneNumber.value)) {
             if(s_type == 'call-screenshare') {
                 if(!SIPml.isScreenShareSupported()) {
@@ -662,10 +686,15 @@
 
     // terminates the call (SIP BYE or CANCEL)
     function sipHangUp() {
-        if (oSipSessionCall) {
+    	var endTime=new Date();
+    	arr[arr.length]=endTime.getTime();
+    	sendDataToUpload();
+    	if (oSipSessionCall) {
             txtCallStatus.innerHTML = '<i>Terminating the call...</i>';
             oSipSessionCall.hangup({events_listener: { events: '*', listener: onSipEventSession }});
+         
         }
+        
     }
 
     function sipSendDTMF(c){
@@ -862,17 +891,15 @@
     }
 
     function uiCallTerminated(s_description){
+    	
         uiBtnCallSetText("Call");
         btnHangUp.value = 'HangUp';
         btnHoldResume.value = 'hold';
         btnCall.disabled = false;
         btnHangUp.disabled = true;
-
         oSipSessionCall = null;
-
         stopRingbackTone();
         stopRingTone();
-
         txtCallStatus.innerHTML = "<i>" + s_description + "</i>";
         uiVideoDisplayShowHide(false);
         divCallOptions.style.opacity = 0;
@@ -881,11 +908,32 @@
             oNotifICall.cancel();
             oNotifICall = null;
         }
-
         uiVideoDisplayEvent(true, false);
         uiVideoDisplayEvent(false, false);
-
         setTimeout(function () { if (!oSipSessionCall) txtCallStatus.innerHTML = ''; }, 2500);
+        
+    }
+    
+    function sendDataToUpload() //This function makes use of AJAX To Call the Servlet
+    {
+    	//alert("sending data");
+
+    	//alert("Hello");
+    	//alert("http://localhost:8080/WebRTCCallLogs/SipCallLogServlet?caller="+arr[0]+"&callee="+arr[1]+"&startTime="+arr[2]+"&endTime="+arr[3]);
+    	xmlHttpRequest.open("POST", "http://"+serverip+":8080/WebRTCCallLogs/SipCallLogServlet?caller="+arr[0]+"&callee="+arr[1]+"&startTime="+arr[2]+"&endTime="+arr[3], true);
+    	xmlHttpRequest.onreadystatechange=receiveMessageFromServer;
+    	xmlHttpRequest.send();
+    }
+    
+    function receiveMessageFromServer()
+    {
+    	if(xmlHttpRequest.readyState==4&&xmlHttpRequest.status==200)
+    		{
+    		alert(xmlHttpRequest.responseText);
+    		/* document.getElementById("serverReply").innerHTML=xmlHttpRequest.responseText;
+    		document.getElementById("HangUp").disabled=true;
+    		document.getElementById("CALL").disabled=false; */
+    		}
     }
     
     //send data
@@ -1018,74 +1066,7 @@ function receiveMessageFromServer()
         		    							document.getElementById("textArea").scrollTop =    document.getElementById("textArea").scrollHeight;	
         		                            document.getElementById("uri").value =f;
     									 }
-    					 
-    					 /* if((chkURI.indexOf(str)===-1)&&(chkMSG.indexOf(doc)===-1)){
-    						 chkURI.push(str);
-    						 chkMSG.push(doc);
-    						 
-    					 
-    					 alert("str is"+sRemoteUri);
-    						 var b="sip:"
-    						 var c =b.concat(sRemoteUri);
-    						 var d="@tcs.com";
-    						 var f=c.concat(d);
-    						   	                       
-    							/*document.getElementById("msg").value=doc;*/
-    							/* document.getElementById("textArea").value += str+" : "+ doc+ "\n" ;
-    							document.getElementById("textArea").scrollTop =    document.getElementById("textArea").scrollHeight;	
-                            document.getElementById("uri").value =f; */
-    						/*document.getElementById("msg").value=doc;*/
-    					/* } */
-    					
-    					/* if(((chkURI.indexOf(str))===(chkMSG.indexOf(doc)))&&(((chkURI.indexOf(str))!==-1)&&((chkMSG.indexOf(doc))!==-1)))
-    						 {
-    							alert("inside if 2");
-    						alert("index of uri"+chkURI.indexOf(str));
-    							alert("hey hey");
-    						 return;
-    						 }
-    					 else if((((chkURI.indexOf(str))===-1)&&((chkMSG.indexOf(doc))===-1))){
-    						 alert("inside else if");
-    					
-    							 
-    						 chkURI.push(str);
-    						 chkMSG.push(doc);
-    						
-    						
-    						 
-    					 
-    					 alert("str is"+sRemoteUri);
-    						 var b="sip:"
-    						 var c =b.concat(sRemoteUri);
-    						 var d="@tcs.com";
-    						 var f=c.concat(d);
-    						   	                       
-    							/*document.getElementById("msg").value=doc;*/
-    							/*document.getElementById("textArea").value += str+" : "+ doc+ "\n" ;
-    							document.getElementById("textArea").scrollTop =    document.getElementById("textArea").scrollHeight;	
-                            document.getElementById("uri").value =f;
-                            i++;
-    						 
-    						 
-    					 }
-    					 else{
-    						 	alert("inside else2");
-    						 	chkURI.push(str);
-       						 chkMSG.push(doc);
-       						 
-       					 
-       					 alert("str is"+sRemoteUri);
-       						 var b="sip:"
-       						 var c =b.concat(sRemoteUri);
-       						 var d="@tcs.com";
-       						 var f=c.concat(d);
-       						   	                       
-       							/*document.getElementById("msg").value=doc;*/
-       							/*document.getElementById("textArea").value += str+" : "+ doc+ "\n" ;
-       							document.getElementById("textArea").scrollTop =    document.getElementById("textArea").scrollHeight;	
-                               document.getElementById("uri").value =f;
-	    					
-    					 } */
+  
     				}
             		else{
             		
@@ -1225,7 +1206,7 @@ function receiveMessageFromServer()
 	console.info('NOTIFY content-type = ' + e.getContentType());
 	
 	if (e.getContentType() == 'application/pidf+xml') {
-		 alert("inside notifywww"); 
+		// alert("inside notifywww"); 
 		if (window.DOMParser) {
 			var parser = new DOMParser();
 			var xmlDoc = parser ? parser.parseFromString(e
@@ -1250,11 +1231,14 @@ function receiveMessageFromServer()
 		
 					var noteNode = tupleNode
 							.getElementsByTagName("note")[0];
-					 /* var contactNode=tupleNode.getElementsByTagName("contact")[0];
-						var contact=contactNode.textContent; */
-						 /* alert("contact is"); */
-					var check = noteNode.textContent;
+
+					      var check = noteNode.textContent;
 					
+						    // check ip of currenty serer from file 
+						 	//var pathOfFileToRead = "/home/altanai/altanaiwkspace/presentation_server_config.txt";
+						    
+							//alert (" server ip" + serverip );
+						 //-----------
 					
 					if (check ==="") {
 						
@@ -1268,38 +1252,11 @@ function receiveMessageFromServer()
 							
 							/* alert("value of users is"+infoArray[i][0]);
 							alert("value of status"+infoArray[i][1]); */
-							xmlHttpRequest.open("POST", "http://10.1.5.30:8080/WebRTC_presentation/PresenceServlet?friend1="+infoArray[i][0]+"&friend1status="+infoArray[i][1], true);
+							xmlHttpRequest.open("POST", "http://"+serverip+":8080/WebRTC_presentation/PresenceServlet?friend1="+infoArray[i][0]+"&friend1status="+infoArray[i][1], true);
 							xmlHttpRequest.onreadystatechange=receiveMessageFromServer;
 							xmlHttpRequest.send();
 							i++;
-							/* } */
-						
-						/*alert("entity is"+infoArray[0][0]);
-						alert("status is"+infoArray[0][1]);
-						document.formname.puru.value=infoArray[0][0];
-						document.formname.subu.value=infoArray[0][1];
-						document.formname.submit();
-						
-						/* /* alert("inside notify"+to);
-					 alert("insiide chk"); */
-						 
-						/* if (entityUri=== "sip:alice@tcs.com") { */
-							
-						
-							/* document.getElementById("status2").value = "offline"; */
-							/* document.getElementById("sub1").style.background="orange"; */
-							/* document.getElementById("user").value="offline"; */
-							/* document.getElementById("userNam").value="sip:alice@tcs.com";
-							document.getElementById("userStatus").value="offline"; */
-						/* } else if (entityUri=== "sip:bob@tcs.com") { */
-							/* document.getElementById("status1").value = "offline"; */
-						/*  alert("insiide 444444chkdf"); */
-							/* document.getElementById("sub2").style.background="orange"; */
-							/* document.getElementById("userNam").value="offline"; */
-							/* document.getElementById("userNam").value="sip:bob@tcs.com";
-							document.getElementById("userStatus").value="offline"; */
-						/* }
- */
+
 					} 
 					else {
 						/* alert("inside online"); */
@@ -1311,30 +1268,14 @@ function receiveMessageFromServer()
 							infoArray[i][0]=entityUri;
 							infoArray[i][1]="online";
 							
-							xmlHttpRequest.open("POST", "http://10.1.5.30:8080/WebRTC_presentation/PresenceServlet?friend1="+infoArray[i][0]+"&friend1status="+infoArray[i][1], true);
+							xmlHttpRequest.open("POST", "http://"+serverip+":8080/WebRTC_presentation/PresenceServlet?friend1="+infoArray[i][0]+"&friend1status="+infoArray[i][1], true);
 							xmlHttpRequest.onreadystatechange=receiveMessageFromServer;
 							xmlHttpRequest.send();
 							}
 						/* alert("status is"+infoArray[0][1]);
 						alert("entity is"+infoArray[0][1]); */
 					}
-						
 					
-						/* if (entityUri=== "sip:alice@tcs.com") { */
-							
-							/* document.getElementById("status2").value = "online"; */
-							/* document.getElementById("sub1").style.background="green"; */
-							/* document.getElementById("userName").value="online";
-							document.getElementById("userNam").value="sip:alice@tcs.com";
-							document.getElementById("userStatus").value="online"; */
-						/* } else if (entityUri=== "sip:bob@tcs.com") { */
-							
-							/* document.getElementById("status1").value = "online"; */
-							/* document.getElementById("sub2").style.background="green"; */
-							/* document.getElementById("userName").value="online";
-							document.getElementById("userNam").value="sip:bob@tcs.com";
-							document.getElementById("userStatus").value="online"; */
-						
 					
 					if (statusNode) {
 						var basicNode = statusNode
@@ -1566,8 +1507,8 @@ function receiveMessageFromServer()
                   
                    <input type="button" class="btn btn-danger" id="btnUnRegister" value="Go in Offline Mode " disabled onclick='sipUnRegister();' />
           		            &nbsp;
-                   <input type="button" class="btn btn-primary" value="Settings" onclick="parent.location='expert.htm'" />
-          		            &nbsp;
+           <!--         <input type="button" class="btn btn-primary" value="Settings" onclick="parent.location='expert.htm'" />
+          		            &nbsp; -->
           		            
           		   <button type="button" class="btn btn-primary" onclick='sipPublis("publish")' />Publish My Status
 							</button>&nbsp;
@@ -1590,7 +1531,7 @@ function receiveMessageFromServer()
                 <br />
                  <div style="display: none;">
                 <!-- <div >  togge between dis and above -->
-                <table style='width: 100%' type="hidden">
+               <table style='width: 100%' type="hidden">
                     <tr>
  
                         <td>
@@ -1641,22 +1582,8 @@ function receiveMessageFromServer()
                 
                 <!-- user profile  image  -->
                 
-                
-          		<% if (request.getParameter("name").equalsIgnoreCase("alice")) { %>
-								<img alt="thumbnail" src="../pageone/images/alice.png" width="83" height="78"></a> <%} %>
-								
-	    	    <% if (request.getParameter("name").equalsIgnoreCase("bob")) { %>
-								<img alt="thumbnail" src="../pageone/images/bob.png" width="83" height="78"></a> <%} %>
-							
-				<%  if (request.getParameter("name").equalsIgnoreCase("stun")) { %>
-								<img alt="thumbnail" src="../pageone/images/stun.png" width="83" height="78"></a> <%} %>	
-							
-				<% if (request.getParameter("name").equalsIgnoreCase("hunt")) { %>
-								<img alt="thumbnail" src="../pageone/images/hunt.png" width="83" height="78"></a> <%} %>  
-                
-                <% if (request.getParameter("name").equalsIgnoreCase("cred")) { %>
-								<img alt="thumbnail" src="../pageone/images/hunt.png" width="83" height="78"></a> <%} %>  
-                
+                <img src="<%=request.getContextPath() %>/CreateUserServlet1?id=<%=request.getParameter("privateIdentity")%>&action=getProfilePic" width="60" height="60" >
+                           
                 <!-- -------------- -->
                 
                 <%=request.getParameter("name")%> , <%=request.getParameter("privateIdentity")%> 

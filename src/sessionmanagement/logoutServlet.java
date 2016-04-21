@@ -39,7 +39,7 @@ public class logoutServlet extends HttpServlet {
 		       
 		        response.setHeader("Cache-Control", "no-cache, no-store"); 
 		        response.setHeader("Pragma", "no-cache");
-		        response.sendRedirect("/WebRTC_presentation/pageone/login.html");  
+		        response.sendRedirect("/WebRTC_presentation/pageone/login.jsp");  
 		    }
 		    catch (Exception sqle)
 		    {

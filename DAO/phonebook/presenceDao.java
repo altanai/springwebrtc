@@ -201,7 +201,7 @@ public int writepresence(String sipuri, String status){
 }	
 
 
-public static void main(String args[]) {
+public static void main3(String args[]) {
 	presenceDao pd=new presenceDao();
 	int result = pd.writepresence("sip:hunt@tcs.com", "offline");
 	System.out.println(" result : "+ result );
@@ -214,7 +214,7 @@ public static void main2(String args[]) {
 	
 }
 
-public static void main3(String args[]){
+public static void main(String args[]){
 	registrationDao rdao=new registrationDao();
 	ArrayList<registration> registeredusers =rdao.fetchregisteredvalues();
 	System.out.println(" fetched registrstion values for phonebook "+ registeredusers.size()+registeredusers.toString());

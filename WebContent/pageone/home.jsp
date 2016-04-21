@@ -6,10 +6,10 @@
 
         <table>
         <tr>
-        <td><iframe src="../sipml5/callim.jsp?name=<%=session.getAttribute("name")%>&privateIdentity=sip:<%=session.getAttribute("name")%>@tcs.com&realm=tcs.com" 
+        <td><iframe src="../sipml5/callim.jsp?ip=<%=session.getAttribute("serverip")%>&name=<%=session.getAttribute("name")%>&privateIdentity=sip:<%=session.getAttribute("name")%>@tcs.com&realm=tcs.com" 
         id="myIframe" frameborder="0" width="700" height="700" align="left" scrolling="yes"></iframe>           
         </td>
-        <td><iframe src="../phonebook" align="right" height="700" width="400" frameborder="0"></iframe> 
+        <td><iframe src="../phonebookLineServlet" align="right" height="700" width="400" frameborder="0"></iframe> 
         </td>
         <tr>
         </table>

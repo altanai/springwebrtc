@@ -3,13 +3,16 @@
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.sql.ResultSet"%>
 <%@page import="presence.beanclass.presence"%>
+<%@page import="phonebook.webrtc.UserProfile"%>
 
 <%
     ArrayList<presence> list = new ArrayList<presence>();
 	list = (ArrayList) request.getAttribute("registrationDetails");
 
 %>
-
+<%
+ArrayList<UserProfile> users=(ArrayList<UserProfile>)request.getAttribute("List");
+%>
 
 <!DOCTYPE html>
 <!--[if IE 7 ]>    <html class="ie7 oldie"> <![endif]-->
@@ -52,6 +55,7 @@
 <script src="js/jquery.fancybox-1.3.4.pack.js"></script>
 <script src="js/init.js"></script>
 
+
 </head>
 
 <body>
@@ -60,40 +64,16 @@
 <table>
 
 <tr>
-
-<!-- <form name="f2" method ="post" action="../WebRTC_presentation/phonebookServlet"> -->
-
-<!-- <td colspan="3">  -->
-<!-- 	<table> -->
-<!-- 	             <h3 align="center">Add Contacts</h3> -->
-	            
-<!-- 	            <tr> -->
-<!-- 	            <th align="left">Display Name:</th><td><input type="text" name="displayName"></td> -->
-<!-- 	            </tr> -->
-	            
-<!-- 	            <tr> -->
-<!-- 	            <th align="left">Public Identity:</th><td><input type="text" name="publicIdentity"></td> -->
-<!-- 	            </tr> -->
-	            
-<!-- 	            <tr> -->
-<!-- 	            <td colspan="4" align="center"><input type="submit" name="submit" value="Add"></td> -->
-<!-- 	            </tr> -->
-	                      
-<!-- 	</table> -->
-<!-- </td> -->
-<!-- </form>        -->
-    
+  
  <td>          
 	<div class="content-wrap">
 
 		<section id="about-us" class="clearfix">
 
-
-
 			<div class="primary">
 
 				<p class="intro">
-				<h3 align="center">Phone Book Enteries</h3>
+				<h3 align="left">Phone Book</h3>
 				</p>
 
 				<ul class="the-team">
@@ -104,26 +84,10 @@
 					<li class="odd">
 						<div class="thumbnail">
 						<table>
-						<tr>
 						
+						<tr>
 							<td>
-							 
-							 <% if (list.get(i).getDisplayName().toString().equalsIgnoreCase("alice")) { %>
-								<a href="../sipml5/usercall.jsp"><img alt="thumbnail" src="pageone/images/alice.png"
-								width="83" height="78"></a> <%} %>
-								
-							 <% if (list.get(i).getDisplayName().toString().equalsIgnoreCase("cred")) { %>
-								<a href="../sipml5/usercall.jsp"><img alt="thumbnail" src="pageone/images/bob.png"
-								width="83" height="78"></a> <%} %>
-							
-							<% if (list.get(i).getDisplayName().toString().equalsIgnoreCase("stun")) { %>
-								<a href="../sipml5/usercall.jsp"><img alt="thumbnail" src="pageone/images/stun.png"
-								width="83" height="78"></a> <%} %>	
-							
-							<% if (list.get(i).getDisplayName().toString().equalsIgnoreCase("hunt")) { %>
-								<a href="../sipml5/usercall.jsp"><img alt="thumbnail" src="pageone/images/hunt.png"
-								width="83" height="78"></a> <%} %>
-								
+								<img src="<%=request.getContextPath() %>/CreateUserServlet1?id=<%=list.get(i).getPrivateIdentity().toString()%>&action=getProfilePic" width="60" height="60" >
 							</td>
 						
 						    <td>
@@ -141,7 +105,7 @@
 			                       </tr>
 			                       <tr>
 			                           <td>
-			                            	<a href="pageone/contact.jsp?name=<%=list.get(i).getDisplayName().toString()%>&privateIdentity=<%=list.get(i).getPrivateIdentity().toString()%>&realm=<%=list.get(i).getRealm().toString()%>" target="_blank">Go</a>
+			                            	<a href="sipml5/usercall.jsp?name=<%=list.get(i).getDisplayName().toString()%>&privateIdentity=<%=list.get(i).getPrivateIdentity().toString()%>&realm=<%=list.get(i).getRealm().toString()%>" target="_blank">Go</a>
 			                            </td>
 			                    
 										<td>
